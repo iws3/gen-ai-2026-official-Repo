@@ -1,0 +1,1 @@
+# These are the three ways to actually run a model, and picking the right one is mostly about UX and throughput tradeoffs
