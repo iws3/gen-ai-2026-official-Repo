@@ -39,6 +39,7 @@ for tool_call in response.tool_calls:
 #     """ Get a weather for a city. """
 #     return f"The weather in {city} is sunny."
 
+
 # agent=create_agent(
 #     model="gemini-2.5-flash",
 #     tools=[get_weather],
@@ -70,3 +71,6 @@ final_response=model_with_tools.invoke(messages)
 
 print(f"final response: {final_response.text}")
 print(messages)
+
+
+# started working with tools
