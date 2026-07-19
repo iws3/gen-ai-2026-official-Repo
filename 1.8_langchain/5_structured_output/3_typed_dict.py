@@ -7,12 +7,13 @@ from dotenv import load_dotenv
 from langchain.chat_models import init_chat_model
 from pydantic import BaseModel, Field
 load_dotenv()
+from typing_extensions import TypedDict, Annotated
+
 
 # os.environ["GOOGLE_API_KEY"]=os.getenv("GOOGLE_API_KEY")
 os.environ["GOOGLE_API_KEY"]=os.getenv("GOOGLE_API_KEY")
 model=init_chat_model("google_genai:gemini-2.5-flash")
 
-from typing_extensions import TypedDict, Annotated
 class MovieDict(TypedDict):
     """A movie with details"""
     title:Annotated[str, "The title of the movie"]
@@ -23,6 +24,6 @@ class MovieDict(TypedDict):
     
 model_typedict=model.with_structured_output(MovieDict)
 
-res=model_typedict.invoke(model_typedict)
+res=model_typedict.invoke("Please provide the details of the movie Avengers")
 print(res)   
     
