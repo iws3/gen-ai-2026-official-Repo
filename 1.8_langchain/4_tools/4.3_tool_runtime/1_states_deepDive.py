@@ -35,7 +35,8 @@ agent=create_agent(
 
 result=agent.invoke({
     "messages":"Look for user information",
-    "user_id":"user_!23"
+    "user_id":"user_123"
 })
 
+# print(result["messages"][-1].content)
 print(result)
