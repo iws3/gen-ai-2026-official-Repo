@@ -1,0 +1,33 @@
+{
+  "type": "ai",
+  "content": [
+    {
+      "type": "text",
+      "text": "I'm sorry, I was unable to retrieve your account information. The system indicates that the user was not found.",
+      "extras": {
+        "signature": "CuECARFNMg/pU32Zs2OUkdOoJgJ7CXBBSUphwSdOexKqnVfmas09C4nlxrKZEphImI9XW42Bg5F87xTQ2s6A4URN+Yverk528DTM3XoTgGczmPdqCiU7wfNtPj/8kvF3PBCS6m4aVCK3QwpdZKyLWexcF4iLJH3B+aB9mp47NFdRqn8nPe4yAA0zSAKwbeVUX3oRlmh9A+ench/B7CV221efdyFG1XQewocqpdz2+SqIwGDMmrWr4WD2jye6wtj6SUpaQ2U018kJRYNhpZcPnMqnNb4wWQFl+KN2VGOnXsSjVo4VbIWdJ3hsM4Oxg/fxenPpMZjpuTLB1dJtqSLIjdkMhnRsNmecNZFnualCbT02MdQhFEgHzLwVRl6E9WVqfFEFVHbuT6Mt561wAXwy5/zGFDpg61vYyw6Wiosz+amiEHGzOr53t7LQWtwt+Xtpq4/xIOjpmqLSJIv2j6HUEsnAO3M="
+      }
+    }
+  ],
+  "additional_kwargs": {},
+  "response_metadata": {
+    "finish_reason": "STOP",
+    "model_name": "gemini-2.5-flash",
+    "safety_ratings": [],
+    "model_provider": "google_genai"
+  },
+  "id": "lc_run--019f7f93-36db-7381-b537-e2a0761ce56d-0",
+  "tool_calls": [],
+  "invalid_tool_calls": [],
+  "usage_metadata": {
+    "input_tokens": 67,
+    "output_tokens": 95,
+    "total_tokens": 162,
+    "input_token_details": {
+      "cache_read": 0
+    },
+    "output_token_details": {
+      "reasoning": 71
+    }
+  }
+}
