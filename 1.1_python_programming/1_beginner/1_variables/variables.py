@@ -12,7 +12,43 @@ Topics:
 # 1. Variables and assignment
 # Tutor note: write teaching examples and code snippets here.
 
-def example_variables_and_assignment_1():
-    # Add example code for variables_and_assignment here
-    pass
+
+
+
+# 1. What is a variable?
+#  --it changes
+#  -- Memory location to store information
+
+# 2. Variable naming convension
+# valid
+model_name="GPT-4"
+model2="gemini-2.5-flash"
+modelName="gpt5"
+ModelName="gpt5"
+
+# invalid
+2age=15
+student-name="gita"
+class=12
+
+#   Exercise:
+# 1. create a variable for your name
+# 2. your age
+# 3. your countr
+# 4. your favorite programming language
+
+# kawood for variables
+
+
+
+
+
+
+
+
+
+
+
+
+
 
