@@ -26,6 +26,8 @@ model2="gemini-2.5-flash"
 modelName="gpt5"
 ModelName="gpt5"
 
+# I AM DONE WITH VARIABLES
+
 # invalid
 2age=15
 student-name="gita"
