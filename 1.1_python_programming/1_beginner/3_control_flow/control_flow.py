@@ -44,3 +44,5 @@ data={
     "name":"gita",
     "id":"123uifv"
 }
+
+data2=["john", "peter", "Paul", "Adrian"]
