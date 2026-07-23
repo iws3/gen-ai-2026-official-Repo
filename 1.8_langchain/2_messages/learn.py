@@ -22,4 +22,24 @@ messages=[
     HumanMessage("Translate : I love building applications"),
 ]
 
-response=
+response=model.invoke(messages)
+
+# _______________________________________________________________________
+
+# **Three equivalent ways to represent input**, all valid:
+
+model.invoke("Why is the sky blue") 
+# above is shortcut for human message
+model.invoke([
+    {"role":"system", "content":"You are a poetry expert"},
+    {"role":"user", "content":"Write a haiku about spring"}
+])
+
+
+# _______________________________________________________________________
+
+
+
+
+
+# **`AIMessage`** is what invoking a model returns. Key attributes: `.text` (plain string), `.content` (raw, provider-shaped), `.content_blocks` (normalized, provider-agnostic list), `.tool_calls`, `.usage_metadata`.

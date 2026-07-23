@@ -5,6 +5,7 @@ from langgraph.graph.message import add_messages
 
 # add_messages is called reducers
 
+
 class State(TypedDict):
     messages:Annotated[list, add_messages]
     

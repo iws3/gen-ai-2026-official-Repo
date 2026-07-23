@@ -1,0 +1,74 @@
+{
+  "messages": [
+    {
+      "type": "ai",
+      "content": "",
+      "additional_kwargs": {
+        "function_call": {
+          "name": "get_user_info",
+          "arguments": "{}"
+        },
+        "__gemini_function_call_thought_signatures__": {
+          "e665a153-5e8d-4179-9a15-b2747425c6af": "CosCARFNMg8CZG8Q9Qseas+qQrHxWs5qqB1+lPrit8LItxZAosWe38jAf/MFXgFrZ3ZG6FORMykvxiBb2TtJUPJJxlzPardcWDVx3tFhBjUHTV5sGjTOmUbP1QQ6O/EUUo3G2kNgj7zGO1Rf9Tdwtcvd4FuRv/094ICcyfapLeTZJlUFulBOSH7m6M/PUh/5IiM0wSMQYIANIiBnmWr+4WOnUpQlsl8RZWNVL43VvgmsoQU7/xhs0xONDoksl8U+JmGFDOxXWXvrAqzIlhsZuQWatwLUkLrlk59GiqK5+qI5AMKzLPSJlES/aziDNPPgONAjh5nbSye1leWcfw7Mb9nOG+Kwt1vx3Ceyq0QO"
+        }
+      },
+      "response_metadata": {
+        "finish_reason": "STOP",
+        "model_name": "gemini-2.5-flash",
+        "safety_ratings": [],
+        "model_provider": "google_genai"
+      },
+      "id": "lc_run--019f7f7d-200a-7c53-a20c-8d0e835f7bbb-0",
+      "tool_calls": [
+        {
+          "name": "get_user_info",
+          "args": {},
+          "id": "e665a153-5e8d-4179-9a15-b2747425c6af",
+          "type": "tool_call"
+        }
+      ],
+      "invalid_tool_calls": [],
+      "usage_metadata": {
+        "input_tokens": 33,
+        "output_tokens": 65,
+        "total_tokens": 98,
+        "input_token_details": {
+          "cache_read": 0
+        },
+        "output_token_details": {
+          "reasoning": 53
+        }
+      }
+    },
+    {
+      "type": "tool",
+      "name": "get_user_info",
+      "content": "User is John Smith",
+      "id": "9c03a417-1322-404b-b4a5-4fc3fd1d009c",
+      "tool_call_id": "e665a153-5e8d-4179-9a15-b2747425c6af"
+    },
+    {
+      "type": "ai",
+      "content": "Here is the user information: User is John Smith.",
+      "additional_kwargs": {},
+      "response_metadata": {
+        "finish_reason": "STOP",
+        "model_name": "gemini-2.5-flash",
+        "safety_ratings": [],
+        "model_provider": "google_genai"
+      },
+      "id": "lc_run--019f7f7d-2449-7252-adc7-b8c0fb558835-0",
+      "tool_calls": [],
+      "invalid_tool_calls": [],
+      "usage_metadata": {
+        "input_tokens": 65,
+        "output_tokens": 11,
+        "total_tokens": 76,
+        "input_token_details": {
+          "cache_read": 0
+        }
+      }
+    }
+  ],
+  "user_id": "user_123"
+}

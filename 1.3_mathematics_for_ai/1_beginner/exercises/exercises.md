@@ -11,7 +11,6 @@ Define a vector and compute its magnitude using Python. Explain what the result 
 Solve a simple linear equation manually and confirm the solution with Python.
 
 ## 3. Basic Statistics
-
 Compute the mean, median, and variance for a small dataset in Python.
 
 ## Bonus exercise
