@@ -35,3 +35,12 @@ print("My school is " + school + " and my department is " + department);
 # do the same thing with interpolation
 print(f"My school is: {school} and my department is {department}")
     
+# exploring data structures and alsogithms
+
+
+
+
+data={
+    "name":"gita",
+    "id":"123uifv"
+}
