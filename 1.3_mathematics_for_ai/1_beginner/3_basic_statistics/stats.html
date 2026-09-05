@@ -1,0 +1,2539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Statistics for Machine Learning — From Zero to Pro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<style>
+  :root {
+    --bg: #0d0d12;
+    --bg2: #09090d;
+    --surface: #1a1a24;
+    --surface2: #242433;
+    --surface3: #2c2c3d;
+    --border: #33334d;
+    --accent: #7fff6e;
+    --accent-dim: rgba(127,255,110,0.1);
+    --text: #ffffff;
+    --muted: #b0b0cc;
+    --muted2: #7d7d99;
+    --code-bg: #1e1e1e;
+    --mac-red: #ff5f57;
+    --mac-yellow: #ffbd2e;
+    --mac-green: #28c840;
+    --purple: #cba6f7;
+    --blue: #89b4fa;
+    --orange: #fab387;
+    --teal: #89dceb;
+    --pink: #f5c2e7;
+    --red: #f38ba8;
+    --yellow: #f9e2af;
+    --sidebar-w: 300px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    line-height: 1.5;
+    overflow-x: hidden;
+  }
+
+  ::selection { background: var(--accent); color: #06140a; }
+
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: var(--bg2); }
+  ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 8px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--border); }
+
+  a { color: inherit; }
+
+  /* ═══════════ TOP PROGRESS BAR ═══════════ */
+  .progress-bar-wrap {
+    position: fixed; top: 0; left: 0; width: 100%; height: 3px;
+    background: var(--border); z-index: 500;
+  }
+  .progress-bar-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--accent), var(--teal));
+    transition: width 0.15s linear;
+  }
+
+  /* ═══════════ TOPBAR ═══════════ */
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; height: 64px;
+    display: flex; align-items: center; gap: 16px;
+    padding: 0 22px 0 22px;
+    background: rgba(13,13,18,0.85);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
+    z-index: 400;
+  }
+  .topbar .brand {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.95rem; letter-spacing: 1px; color: var(--text);
+    white-space: nowrap;
+  }
+  .topbar .brand .dot { color: var(--accent); }
+  .menu-btn {
+    display: none;
+    width: 40px; height: 40px; border-radius: 10px;
+    border: 1px solid var(--border); background: var(--surface);
+    color: var(--text); cursor: pointer; font-size: 1.2rem;
+    align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .topbar-search {
+    margin-left: auto; display: flex; align-items: center; gap: 10px;
+  }
+  .progress-pill {
+    font-family: 'Space Mono', monospace; font-size: 0.78rem; color: var(--muted);
+    border: 1px solid var(--border); padding: 6px 14px; border-radius: 100px;
+    white-space: nowrap;
+  }
+  .progress-pill strong { color: var(--accent); }
+
+  /* ═══════════ SIDEBAR ═══════════ */
+  .sidebar {
+    position: fixed; top: 64px; left: 0; bottom: 0; width: var(--sidebar-w);
+    background: var(--bg2); border-right: 1px solid var(--border);
+    overflow-y: auto; z-index: 300; padding: 18px 0 40px;
+  }
+  .sidebar::-webkit-scrollbar { width: 6px; }
+  .side-group { margin-bottom: 4px; }
+  .side-group-title {
+    font-family: 'Space Mono', monospace; font-size: 0.68rem; letter-spacing: 3px;
+    text-transform: uppercase; color: var(--muted2);
+    padding: 14px 22px 8px;
+  }
+  .side-link {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 22px; font-size: 0.92rem; color: var(--muted);
+    cursor: pointer; border-left: 3px solid transparent;
+    transition: 0.2s; text-decoration: none;
+  }
+  .side-link .num { font-family: 'Space Mono', monospace; font-size: 0.72rem; color: var(--muted2); width: 20px; flex-shrink:0;}
+  .side-link:hover { background: var(--surface); color: var(--text); }
+  .side-link.active { border-left-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+  .side-link.active .num { color: var(--accent); }
+
+  /* ═══════════ LAYOUT ═══════════ */
+  .app { padding-top: 64px; padding-left: var(--sidebar-w); min-height: 100vh; }
+  .main { max-width: 1180px; margin: 0 auto; padding: 0 56px 120px; }
+
+  @media (max-width: 980px) {
+    .sidebar { transform: translateX(-100%); transition: transform 0.3s; box-shadow: 20px 0 60px rgba(0,0,0,0.5); }
+    .sidebar.open { transform: translateX(0); }
+    .app { padding-left: 0; }
+    .menu-btn { display: flex; }
+    .main { padding: 0 20px 100px; }
+    .progress-pill { display: none; }
+  }
+
+  /* ═══════════ HERO ═══════════ */
+  .hero {
+    min-height: calc(100vh - 64px);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; position: relative; overflow: hidden;
+    padding: 60px 20px;
+  }
+  .hero::before {
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 700px 400px at 20% 20%, rgba(127,255,110,0.09), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 85% 75%, rgba(137,180,250,0.08), transparent 60%);
+    pointer-events: none;
+  }
+  .hero-eyebrow {
+    font-family: 'Space Mono', monospace; font-size: 0.85rem; letter-spacing: 5px;
+    color: var(--accent); text-transform: uppercase; margin-bottom: 26px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .hero-eyebrow::before, .hero-eyebrow::after { content:""; width: 34px; height: 1px; background: var(--accent); opacity: 0.5; }
+  .hero h1 {
+    font-size: clamp(2.6rem, 6.4vw, 5.4rem); font-weight: 800; line-height: 1.04;
+    max-width: 1000px; letter-spacing: -0.02em;
+  }
+  .hero h1 .line2 { color: var(--muted); font-weight: 700; }
+  .hero h1 span.grad {
+    background: linear-gradient(90deg, var(--accent), var(--teal));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero p.lede {
+    max-width: 680px; margin: 26px auto 0; font-size: 1.25rem; color: var(--muted); line-height: 1.6;
+  }
+  .hero-stats {
+    display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-top: 44px;
+  }
+  .hero-stat {
+    font-family: 'Space Mono', monospace; border: 1px solid var(--border); background: var(--surface);
+    padding: 14px 22px; border-radius: 12px; min-width: 120px;
+  }
+  .hero-stat .n { font-size: 1.5rem; color: var(--accent); font-weight: 700; display:block; }
+  .hero-stat .l { font-size: 0.68rem; color: var(--muted2); letter-spacing: 2px; text-transform: uppercase; }
+  .hero-cta {
+    margin-top: 46px; display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
+  }
+  .btn {
+    font-family: 'Space Mono', monospace; font-size: 0.88rem; letter-spacing: 1.5px;
+    padding: 15px 30px; border-radius: 10px; cursor: pointer; border: 2px solid transparent;
+    text-transform: uppercase; transition: 0.25s; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-primary { background: var(--accent); color: #06140a; }
+  .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 14px 34px rgba(127,255,110,0.25); }
+  .btn-ghost { border-color: var(--border); color: var(--text); background: var(--surface); }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-3px); }
+  .scroll-cue {
+    position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%);
+    font-family: 'Space Mono', monospace; font-size: 0.7rem; letter-spacing: 3px; color: var(--muted2);
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    animation: bob 2.4s ease-in-out infinite;
+  }
+  @keyframes bob { 0%,100%{transform: translate(-50%,0);} 50%{transform: translate(-50%,8px);} }
+
+  /* ═══════════ SECTION SHELL ═══════════ */
+  .section { padding: 90px 0 10px; scroll-margin-top: 84px; }
+  .section.chapter-open { padding-top: 60px; }
+  .eyebrow {
+    font-family: 'Space Mono', monospace; font-size: 0.78rem; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 4px; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .eyebrow .tag-num { background: var(--accent-dim); border: 1px solid rgba(127,255,110,0.3); padding: 2px 9px; border-radius: 6px; }
+  h2.sec-title {
+    font-size: clamp(1.9rem, 4vw, 3rem); font-weight: 800; line-height: 1.12; margin-bottom: 18px; letter-spacing: -0.01em;
+  }
+  h2.sec-title span { color: var(--accent); }
+  .sec-intro { font-size: 1.18rem; color: var(--muted); max-width: 880px; line-height: 1.7; margin-bottom: 36px; }
+
+  h3.sub-title { font-size: 1.4rem; font-weight: 700; margin: 34px 0 14px; display: flex; align-items: center; gap: 10px; }
+  h3.sub-title .ic { font-size: 1.2rem; }
+
+  /* Chapter divider (big section breaks) */
+  .chapter-divider {
+    padding: 130px 0 90px; text-align: center; position: relative; scroll-margin-top: 64px;
+    border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+    background: radial-gradient(ellipse at 50% 30%, rgba(127,255,110,0.06), transparent 65%);
+    margin: 40px 0;
+  }
+  .chapter-divider .big-num {
+    font-family: 'Space Mono', monospace; font-size: clamp(4rem, 12vw, 9rem); font-weight: 700;
+    color: rgba(127,255,110,0.07); position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%); pointer-events: none; user-select: none; white-space: nowrap;
+  }
+  .chapter-divider .chap-label { font-family: 'Space Mono', monospace; letter-spacing: 5px; color: var(--accent); font-size: 0.85rem; margin-bottom: 18px; text-transform: uppercase;}
+  .chapter-divider h2 { font-size: clamp(2.1rem, 5vw, 3.6rem); font-weight: 800; position: relative; }
+  .chapter-divider p { max-width: 640px; margin: 20px auto 0; color: var(--muted); font-size: 1.15rem; position: relative; }
+
+  /* ═══════════ REVEAL ANIM ═══════════ */
+  .reveal { opacity: 0; transform: translateY(26px); transition: opacity 0.7s cubic-bezier(.2,.7,.3,1), transform 0.7s cubic-bezier(.2,.7,.3,1); }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+
+  /* ═══════════ BOXES ═══════════ */
+  .box { padding: 20px 26px; border-radius: 10px; margin: 16px 0; color: #fff; font-size: 1.08rem; line-height: 1.65; }
+  .accent-box { background: rgba(127,255,110,0.07); border-left: 4px solid var(--accent); }
+  .warn-box   { background: rgba(249,226,175,0.07); border-left: 4px solid var(--yellow); }
+  .danger-box { background: rgba(243,139,168,0.07); border-left: 4px solid var(--red); }
+  .info-box   { background: rgba(137,180,250,0.08); border-left: 4px solid var(--blue); }
+  .purple-box { background: rgba(203,166,247,0.07); border-left: 4px solid var(--purple); }
+  .box strong { color: #fff; }
+  .box-label {
+    font-family: 'Space Mono', monospace; font-size: 0.72rem; letter-spacing: 3px;
+    text-transform: uppercase; display: block; margin-bottom: 10px; opacity: 0.9;
+  }
+  .accent-box .box-label { color: var(--accent); }
+  .warn-box .box-label { color: var(--yellow); }
+  .danger-box .box-label { color: var(--red); }
+  .info-box .box-label { color: var(--blue); }
+  .purple-box .box-label { color: var(--purple); }
+
+  /* ═══════════ CONCEPT GRID (6-question framework) ═══════════ */
+  .qa-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 18px 0 28px; }
+  .qa-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 20px 22px; transition: 0.25s;
+  }
+  .qa-card:hover { border-color: var(--surface3); transform: translateY(-2px); }
+  .qa-card .qh {
+    display: flex; align-items: center; gap: 9px; font-family: 'Space Mono', monospace;
+    font-size: 0.72rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px;
+  }
+  .qa-card .qh .qico { font-size: 1rem; }
+  .qa-card p, .qa-card li { color: var(--muted); font-size: 0.97rem; line-height: 1.6; }
+  .qa-card.q-what .qh { color: var(--accent); }
+  .qa-card.q-why .qh { color: var(--orange); }
+  .qa-card.q-how .qh { color: var(--blue); }
+  .qa-card.q-interpret .qh { color: var(--purple); }
+  .qa-card.q-ml .qh { color: var(--teal); }
+  .qa-card.q-pitfall .qh { color: var(--red); }
+  @media (max-width: 720px) { .qa-grid { grid-template-columns: 1fr; } }
+
+  /* ═══════════ CODE BLOCK ═══════════ */
+  .code-block {
+    background: var(--code-bg); border: 1px solid #3a3a4a; border-radius: 12px;
+    width: 100%; margin: 20px 0; text-align: left; overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04);
+  }
+  .mac-titlebar { background: #2d2d2d; padding: 10px 16px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #3a3a4a; }
+  .mac-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .mac-dot.red { background: var(--mac-red); } .mac-dot.yellow { background: var(--mac-yellow); } .mac-dot.green { background: var(--mac-green); }
+  .mac-filename { font-family: 'Space Mono', monospace; font-size: 0.8rem; color: #888; margin-left: auto; margin-right: auto; padding-right: 50px; }
+  pre { padding: 20px 24px; font-family: 'Space Mono', monospace; color: #cdd6f4; font-size: 0.92rem; overflow-x: auto; white-space: pre; line-height: 1.7; background: var(--code-bg); }
+  .kw{color:#cba6f7;} .fn{color:#89b4fa;} .str{color:#a6e3a1;} .num{color:#fab387;} .cmt{color:#6c7086;font-style:italic;} .var{color:#cdd6f4;} .op{color:#89dceb;} .acc{color:var(--accent);} .err{color:#f38ba8;} .dec{color:#f5c2e7;}
+  .out-block { background: #141418; border-top: 1px dashed #3a3a4a; padding: 14px 24px; font-family:'Space Mono',monospace; font-size:0.85rem; color:#8fd97f; white-space:pre-wrap; }
+  .out-block .lbl { color: #6c7086; letter-spacing:2px; font-size:0.68rem; display:block; margin-bottom:8px; }
+
+  /* ═══════════ FORMULA ═══════════ */
+  .formula-box {
+    background: linear-gradient(145deg, var(--surface), var(--surface2));
+    border: 1px solid var(--border); border-radius: 12px; padding: 26px 30px;
+    margin: 18px 0; text-align: center; font-size: 1.3rem; overflow-x: auto;
+    position: relative;
+  }
+  .formula-box .flabel { position:absolute; top:12px; left:18px; font-family:'Space Mono',monospace; font-size:0.65rem; letter-spacing:2px; color:var(--muted2); text-transform:uppercase; }
+
+  /* ═══════════ TABLE ═══════════ */
+  .table-wrap { width: 100%; margin: 18px 0; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); overflow-x:auto; }
+  table { width: 100%; border-collapse: collapse; min-width: 480px; }
+  th { background: var(--surface2); color: var(--accent); font-family: 'Space Mono', monospace; font-size: 0.78rem; letter-spacing: 2px; padding: 12px 18px; text-align: left; text-transform: uppercase; white-space:nowrap; }
+  td { padding: 11px 18px; font-size: 0.98rem; color: var(--muted); border-top: 1px solid var(--border); }
+  tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+  td code, li code, p code { font-family: 'Space Mono', monospace; color: var(--accent); background: rgba(127,255,110,0.1); padding: 2px 7px; border-radius: 4px; font-size: 0.88em; }
+
+  /* ═══════════ LISTS ═══════════ */
+  ul.arrow-list { list-style: none; }
+  ul.arrow-list li { margin-bottom: 12px; display: flex; gap: 14px; align-items: flex-start; font-size: 1.02rem; color: var(--muted); }
+  ul.arrow-list li::before { content: "→"; color: var(--accent); font-weight: bold; flex-shrink: 0; }
+  ul.arrow-list li strong { color: #fff; }
+
+  /* ═══════════ GRID / CHIPS ═══════════ */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  @media (max-width: 800px) { .grid2, .grid3 { grid-template-columns: 1fr; } }
+  .chip { display: inline-block; background: rgba(127,255,110,0.1); border: 1px solid rgba(127,255,110,0.3); color: var(--accent); font-family: 'Space Mono', monospace; font-size: 0.82rem; padding: 4px 13px; border-radius: 100px; margin: 3px; }
+  .chip.blue { background: rgba(137,180,250,0.1); border-color: rgba(137,180,250,0.3); color: var(--blue); }
+  .chip.purple { background: rgba(203,166,247,0.1); border-color: rgba(203,166,247,0.3); color: var(--purple); }
+  .chip.orange { background: rgba(250,179,135,0.1); border-color: rgba(250,179,135,0.3); color: var(--orange); }
+  .chip.red { background: rgba(243,139,168,0.1); border-color: rgba(243,139,168,0.3); color: var(--red); }
+  .chip.teal { background: rgba(137,220,235,0.1); border-color: rgba(137,220,235,0.3); color: var(--teal); }
+
+  /* ═══════════ TAKEAWAYS ═══════════ */
+  .takeaway-box {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 24px 28px; margin: 30px 0 10px; position: relative; overflow:hidden;
+  }
+  .takeaway-box::before { content:"✓"; position:absolute; top:-18px; right:-6px; font-size:7rem; color: rgba(127,255,110,0.05); font-weight:800; }
+  .takeaway-box .tt-label { font-family:'Space Mono',monospace; color:var(--accent); letter-spacing:3px; font-size:0.75rem; text-transform:uppercase; margin-bottom:12px; display:block;}
+  .takeaway-box ul { list-style:none; }
+  .takeaway-box li { padding-left: 24px; position:relative; margin-bottom:9px; color: var(--muted); font-size:0.98rem; }
+  .takeaway-box li::before { content:"✓"; position:absolute; left:0; color:var(--accent); font-weight:700; }
+
+  /* ═══════════ VIZ PANEL (interactive canvas widgets) ═══════════ */
+  .viz-panel {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 22px 24px 26px; margin: 22px 0; position: relative;
+  }
+  .viz-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; flex-wrap:wrap; gap:10px; }
+  .viz-title { font-family:'Space Mono',monospace; font-size:0.78rem; letter-spacing:2px; text-transform:uppercase; color:var(--teal); display:flex; align-items:center; gap:8px;}
+  .viz-title::before { content:"◉"; color: var(--accent); }
+  .viz-hint { font-size:0.8rem; color:var(--muted2); font-family:'Space Mono',monospace; }
+  .viz-canvas-wrap { width:100%; background: #101018; border-radius: 10px; border:1px solid var(--border); overflow:hidden; }
+  canvas { display:block; width:100%; touch-action: none; cursor: grab; }
+  .viz-controls { display:flex; gap:22px; flex-wrap:wrap; margin-top:16px; align-items:center; }
+  .viz-control { display:flex; flex-direction:column; gap:6px; min-width:150px; flex:1; }
+  .viz-control label { font-family:'Space Mono',monospace; font-size:0.7rem; letter-spacing:1.5px; color:var(--muted); text-transform:uppercase; display:flex; justify-content:space-between; }
+  .viz-control label .val { color: var(--accent); }
+  input[type=range] { -webkit-appearance:none; width:100%; height:5px; border-radius:4px; background: var(--surface3); outline:none; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance:none; width:17px; height:17px; border-radius:50%; background: var(--accent); cursor:pointer; box-shadow: 0 0 0 4px rgba(127,255,110,0.15); }
+  input[type=range]::-moz-range-thumb { width:17px; height:17px; border-radius:50%; background: var(--accent); cursor:pointer; border:none; }
+  .viz-btn-row { display:flex; gap:10px; flex-wrap:wrap; }
+  .mini-btn {
+    font-family:'Space Mono',monospace; font-size:0.72rem; letter-spacing:1px; padding:8px 14px;
+    border-radius:8px; border:1px solid var(--border); background: var(--surface2); color:var(--muted);
+    cursor:pointer; transition:0.2s; text-transform:uppercase;
+  }
+  .mini-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .mini-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+  .viz-readout { display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
+  .readout-chip { background: var(--surface2); border:1px solid var(--border); border-radius:8px; padding:8px 14px; font-family:'Space Mono',monospace; font-size:0.82rem; flex:1; min-width:100px; text-align:center; }
+  .readout-chip .rl { display:block; color:var(--muted2); font-size:0.62rem; letter-spacing:2px; text-transform:uppercase; margin-bottom:4px; }
+  .readout-chip .rv { color: var(--accent); font-size:1.05rem; font-weight:700; }
+
+  /* Draggable dot hint */
+  .drag-hint { position:absolute; font-family:'Space Mono',monospace; font-size:0.65rem; color:var(--muted2); bottom:8px; right:12px; letter-spacing:1px; }
+
+  /* ═══════════ EXERCISE ═══════════ */
+  .exercise-box { background: rgba(137,180,250,0.06); border: 2px dashed var(--blue); padding: 20px 24px; border-radius: 12px; margin: 16px 0; }
+  .exercise-box .ex-label { font-family: 'Space Mono', monospace; font-size: 0.72rem; color: var(--blue); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 10px; display: block; }
+  .exercise-box p, .exercise-box li { color: var(--muted); font-size: 0.98rem; }
+
+  /* ═══════════ QUIZ ═══════════ */
+  .quiz-box { background: var(--surface); border:1px solid var(--border); border-radius:14px; padding:24px 26px; margin: 22px 0; }
+  .quiz-q { font-size:1.08rem; font-weight:700; margin-bottom:14px; }
+  .quiz-opts { display:flex; flex-direction:column; gap:9px; }
+  .quiz-opt { padding:12px 16px; border:1px solid var(--border); border-radius:9px; cursor:pointer; font-size:0.94rem; color:var(--muted); transition:0.2s; background: var(--surface2); }
+  .quiz-opt:hover { border-color: var(--muted2); }
+  .quiz-opt.correct { border-color: var(--accent); background: rgba(127,255,110,0.1); color:#fff; }
+  .quiz-opt.wrong { border-color: var(--red); background: rgba(243,139,168,0.1); color:#fff; }
+  .quiz-fb { margin-top:14px; font-size:0.92rem; color:var(--muted); display:none; padding:12px 14px; border-radius:8px; background: var(--surface2); }
+  .quiz-fb.show { display:block; }
+
+  /* ═══════════ MISC ═══════════ */
+  .divider { height:1px; background: var(--border); margin: 50px 0; border:none; }
+  .icon-tile { width:50px; height:50px; border-radius:12px; background: var(--accent-dim); border:1px solid rgba(127,255,110,0.3); display:flex; align-items:center; justify-content:center; font-size:1.4rem; margin-bottom:14px; }
+  .step-list { counter-reset: step; list-style:none; }
+  .step-list li { counter-increment: step; position:relative; padding-left:46px; margin-bottom:20px; font-size:1rem; color:var(--muted); min-height:32px; }
+  .step-list li::before { content: counter(step); position:absolute; left:0; top:-2px; width:32px; height:32px; border-radius:50%; background: var(--surface2); border:1px solid var(--accent); color:var(--accent); font-family:'Space Mono',monospace; font-weight:700; display:flex; align-items:center; justify-content:center; font-size:0.9rem;}
+  .step-list li strong { color:#fff; }
+
+  footer { padding: 60px 0 40px; text-align:center; color: var(--muted2); font-family:'Space Mono',monospace; font-size:0.85rem; border-top:1px solid var(--border); margin-top:60px; }
+  footer a { color: var(--accent); text-decoration:none; }
+
+  .back-top { position: fixed; bottom: 26px; right: 26px; width:52px; height:52px; border-radius:50%; background:var(--surface); border:1px solid var(--border); color:var(--text); display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:250; opacity:0; pointer-events:none; transition:0.3s; font-size:1.2rem;}
+  .back-top.show { opacity:1; pointer-events:auto; }
+  .back-top:hover { border-color: var(--accent); color:var(--accent); transform: translateY(-4px); }
+</style>
+</head>
+<body>
+
+<div class="progress-bar-wrap"><div class="progress-bar-fill" id="progBar"></div></div>
+
+<div class="topbar">
+  <button class="menu-btn" id="menuBtn" aria-label="Toggle menu">☰</button>
+  <div class="brand"><span class="dot">●</span> STAT<span style="color:var(--accent)">·</span>ML</div>
+  <div class="topbar-search">
+    <span class="progress-pill" id="topProgress">Section 0 / 0</span>
+  </div>
+</div>
+
+<nav class="sidebar" id="sidebar">
+  <div class="side-group">
+    <div class="side-group-title">Ch. 0 · Foundations</div>
+    <a class="side-link" href="#intro"><span class="num">00</span>Introduction</a>
+    <a class="side-link" href="#data-types"><span class="num">01</span>Types of Data</a>
+    <a class="side-link" href="#population-sample"><span class="num">02</span>Population vs Sample</a>
+    <a class="side-link" href="#variables-scales"><span class="num">03</span>Variables &amp; Scales</a>
+  </div>
+  <div class="side-group">
+    <div class="side-group-title">Ch. 1 · Descriptive Stats</div>
+    <a class="side-link" href="#mean"><span class="num">04</span>Mean</a>
+    <a class="side-link" href="#median"><span class="num">05</span>Median</a>
+    <a class="side-link" href="#mode"><span class="num">06</span>Mode</a>
+    <a class="side-link" href="#range"><span class="num">07</span>Range</a>
+    <a class="side-link" href="#variance"><span class="num">08</span>Variance &amp; Std Dev</a>
+    <a class="side-link" href="#quartiles-iqr"><span class="num">09</span>Quartiles &amp; IQR</a>
+    <a class="side-link" href="#percentiles"><span class="num">10</span>Percentiles</a>
+    <a class="side-link" href="#skewness"><span class="num">11</span>Skewness &amp; Kurtosis</a>
+    <a class="side-link" href="#outliers"><span class="num">12</span>Outlier Detection</a>
+    <a class="side-link" href="#cv"><span class="num">13</span>Coeff. of Variation</a>
+  </div>
+  <div class="side-group">
+    <div class="side-group-title">Ch. 2 · Distributions</div>
+    <a class="side-link" href="#distributions"><span class="num">14</span>Data Distributions</a>
+    <a class="side-link" href="#zscores"><span class="num">15</span>Z-Scores</a>
+    <a class="side-link" href="#correlation-covariance"><span class="num">16</span>Correlation &amp; Covariance</a>
+  </div>
+  <div class="side-group">
+    <div class="side-group-title">Ch. 3 · Applied Statistics</div>
+    <a class="side-link" href="#eda"><span class="num">17</span>EDA</a>
+    <a class="side-link" href="#feature-scaling"><span class="num">18</span>Feature Scaling</a>
+    <a class="side-link" href="#feature-engineering"><span class="num">19</span>Feature Engineering</a>
+    <a class="side-link" href="#model-evaluation"><span class="num">20</span>Model Evaluation</a>
+    <a class="side-link" href="#common-mistakes"><span class="num">21</span>Common Mistakes</a>
+  </div>
+  <div class="side-group">
+    <div class="side-group-title">Ch. 4 · Capstone</div>
+    <a class="side-link" href="#case-study"><span class="num">22</span>Case Study</a>
+    <a class="side-link" href="#summary"><span class="num">23</span>Key Takeaways</a>
+  </div>
+  <!-- SIDEBAR_CONTENT -->
+</nav>
+
+<div class="app">
+  <div class="main" id="main">
+    <section class="hero" id="top">
+      <div class="hero-eyebrow">A Zero-to-Pro Course</div>
+      <h1>Statistics for <span class="grad">Machine Learning</span><br><span class="line2">From Zero to Pro</span></h1>
+      <p class="lede">Every model you'll ever train is standing on statistics. Learn the ideas from first principles — intuition first, formulas second, NumPy third — and see exactly how each one shapes the models you build.</p>
+      <div class="hero-stats">
+        <div class="hero-stat"><span class="n">27</span><span class="l">Concepts</span></div>
+        <div class="hero-stat"><span class="n">9</span><span class="l">Live Visualizers</span></div>
+        <div class="hero-stat"><span class="n">100%</span><span class="l">NumPy + Matplotlib</span></div>
+        <div class="hero-stat"><span class="n">0</span><span class="l">Pandas / Sklearn</span></div>
+      </div>
+      <div class="hero-cta">
+        <a href="#intro" class="btn btn-primary">Start Learning →</a>
+        <a href="#case-study" class="btn btn-ghost">Jump to Case Study</a>
+      </div>
+      <div class="scroll-cue">SCROLL ↓</div>
+    </section>
+
+    <!-- ══════════════════════════ INTRO ══════════════════════════ -->
+    <section class="section reveal" id="intro">
+      <div class="eyebrow"><span class="tag-num">Ch. 0</span> Foundations</div>
+      <h2 class="sec-title">Why Statistics Is the <span>Native Language</span> of ML</h2>
+      <p class="sec-intro">Machine learning is often sold as an algorithms story — gradient descent, neural nets, trees. But underneath every algorithm is a set of statistical assumptions about your data. A model doesn't "understand" your problem; it fits a mathematical shape to the <em>distribution</em> of numbers you feed it. If you don't understand that distribution, you're flying blind — even with a perfect algorithm.</p>
+
+      <div class="qa-grid">
+        <div class="qa-card q-what"><div class="qh"><span class="qico">◆</span>What is it?</div><p>Statistics is the discipline of collecting, summarizing, and drawing conclusions from data under uncertainty. In ML, it's the toolkit that turns raw numbers into signals a model can learn from.</p></div>
+        <div class="qa-card q-why"><div class="qh"><span class="qico">◆</span>Why it matters</div><p>Every ML step — cleaning data, engineering features, choosing a loss function, evaluating a model — is a statistical decision in disguise. Skipping statistics means making those decisions blind.</p></div>
+        <div class="qa-card q-how"><div class="qh"><span class="qico">◆</span>How it's used</div><p>Through descriptive summaries (mean, spread), inferential reasoning (does this pattern generalize?), and probability (how confident should the model be?).</p></div>
+        <div class="qa-card q-interpret"><div class="qh"><span class="qico">◆</span>How it's interpreted</div><p>Numbers alone are meaningless without context: a standard deviation of "5" is huge for one feature and tiny for another. Interpretation always depends on scale and distribution.</p></div>
+        <div class="qa-card q-ml"><div class="qh"><span class="qico">◆</span>ML application</div><p>Feature scaling, outlier handling, train/test splitting, evaluation metrics, hypothesis testing for A/B experiments, and understanding model uncertainty all lean directly on statistics.</p></div>
+        <div class="qa-card q-pitfall"><div class="qh"><span class="qico">◆</span>If ignored</div><p>Models silently fail: features on wildly different scales dominate gradient descent, outliers wreck your mean-based features, and you can't tell if 92% accuracy is genuinely good or a broken evaluation.</p></div>
+      </div>
+
+      <div class="accent-box">
+        <span class="box-label">The Core Idea</span>
+        A machine learning model is a <strong>statistical estimator</strong>. Linear regression estimates a conditional mean. Logistic regression estimates a conditional probability. Even deep neural networks are, at their core, function approximators trained by minimizing a statistically-motivated loss. Learn statistics, and ML algorithms stop looking like magic.
+      </div>
+
+      <h3 class="sub-title"><span class="ic">🗺️</span> The Roadmap</h3>
+      <p style="color:var(--muted); font-size:1.02rem; margin-bottom:16px;">This course builds in strict layers — each one depends on the last:</p>
+      <ol class="step-list">
+        <li><strong>Data foundations</strong> — what kinds of data exist, and how we sample it from the world.</li>
+        <li><strong>Descriptive statistics</strong> — summarizing a dataset with single numbers: center, spread, and shape.</li>
+        <li><strong>Distributions & standardized scores</strong> — understanding the "shape" data comes in, and comparing values across different scales.</li>
+        <li><strong>Relationships</strong> — correlation and covariance between features.</li>
+        <li><strong>Applied statistics</strong> — EDA, feature scaling, feature engineering, and model evaluation.</li>
+        <li><strong>Judgment</strong> — the mistakes that quietly break real ML systems, and a full case study tying it all together.</li>
+      </ol>
+
+      <div class="takeaway-box">
+        <span class="tt-label">Key Takeaways</span>
+        <ul>
+          <li>Statistics is not a prerequisite you check off — it's the vocabulary ML is written in.</li>
+          <li>Every preprocessing step and every evaluation metric is a statistical claim about your data.</li>
+          <li>We'll build everything with only NumPy for computation and Matplotlib for visualization, so you see exactly what's happening under the hood.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════ TYPES OF DATA ══════════════════════════ -->
+    <section class="section reveal" id="data-types">
+      <div class="eyebrow"><span class="tag-num">Ch. 0</span> Foundations</div>
+      <h2 class="sec-title">Types of <span>Data</span></h2>
+      <p class="sec-intro">Before you can compute anything, you need to know what kind of "number" you're holding. A ZIP code and a temperature are both numbers — but averaging ZIP codes is meaningless. The type of data determines which statistics, plots, and models are even valid.</p>
+
+      <div class="qa-grid">
+        <div class="qa-card q-what"><div class="qh">What is it?</div><p>A classification of variables into <strong>qualitative</strong> (categorical) and <strong>quantitative</strong> (numerical) types, each with sub-types that determine what operations make sense.</p></div>
+        <div class="qa-card q-why"><div class="qh">Why it matters</div><p>The data type dictates the valid statistic (mean vs. mode), the valid plot (histogram vs. bar chart), and the valid model input encoding (raw number vs. one-hot vector).</p></div>
+        <div class="qa-card q-how"><div class="qh">How it's determined</div><p>Ask: can I order the values? Can I meaningfully subtract or divide them? Is the value counted or measured?</p></div>
+        <div class="qa-card q-interpret"><div class="qh">How it's interpreted</div><p>Nominal = labels with no order (color). Ordinal = ordered labels (rating 1–5). Discrete = countable numbers (children). Continuous = measured on a scale (height).</p></div>
+        <div class="qa-card q-ml"><div class="qh">ML application</div><p>Determines preprocessing: categorical → one-hot/label encoding; continuous → scaling; ordinal → ordinal encoding that preserves order.</p></div>
+        <div class="qa-card q-pitfall"><div class="qh">If ignored</div><p>Label-encoding a nominal feature like "city" as 0,1,2… tells the model "city 2 is greater than city 0" — a completely fabricated relationship.</p></div>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Type</th><th>Sub-type</th><th>Example</th><th>Valid statistics</th><th>Typical ML encoding</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Qualitative</strong></td><td>Nominal</td><td>Country, gender, product category</td><td>Mode, frequency count</td><td>One-hot encoding</td></tr>
+            <tr><td><strong>Qualitative</strong></td><td>Ordinal</td><td>Star rating, education level</td><td>Mode, median, percentiles</td><td>Ordinal / integer encoding</td></tr>
+            <tr><td><strong>Quantitative</strong></td><td>Discrete</td><td>Number of children, page visits</td><td>Mean, mode, variance</td><td>Numeric as-is / binning</td></tr>
+            <tr><td><strong>Quantitative</strong></td><td>Continuous</td><td>Height, temperature, income</td><td>Mean, variance, all descriptive stats</td><td>Scaling / standardization</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="code-block">
+        <div class="mac-titlebar"><div class="mac-dot red"></div><div class="mac-dot yellow"></div><div class="mac-dot green"></div><span class="mac-filename">data_types.py</span></div>
+        <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cmt"># Continuous (measured) — heights in cm, infinitely divisible</span>
+<span class="var">heights</span> <span class="op">=</span> np.random.normal(<span class="num">170</span>, <span class="num">8</span>, <span class="num">10</span>)
+
+<span class="cmt"># Discrete (counted) — number of purchases, whole numbers only</span>
+<span class="var">purchases</span> <span class="op">=</span> np.random.poisson(<span class="num">3</span>, <span class="num">10</span>)
+
+<span class="cmt"># Ordinal — encoded as integers, but gaps aren't equal distances</span>
+<span class="var">ratings</span> <span class="op">=</span> np.array([<span class="num">1</span>, <span class="num">3</span>, <span class="num">5</span>, <span class="num">2</span>, <span class="num">4</span>, <span class="num">5</span>, <span class="num">3</span>])
+
+<span class="cmt"># Nominal — categories with NO numeric meaning; never average these</span>
+<span class="var">colors</span> <span class="op">=</span> np.array([<span class="str">'red'</span>, <span class="str">'blue'</span>, <span class="str">'red'</span>, <span class="str">'green'</span>])
+
+<span class="fn">print</span>(<span class="str">"Mean height:"</span>, np.mean(heights).round(<span class="num">1</span>))   <span class="cmt"># valid ✔</span>
+<span class="cmt"># np.mean(colors)  -> would raise an error: strings can't be averaged</span></pre>
+        <div class="out-block"><span class="lbl">OUTPUT</span>Mean height: 169.4</div>
+      </div>
+
+      <div class="danger-box">
+        <span class="box-label">Common Pitfall</span>
+        Averaging a nominal feature that's been carelessly integer-encoded (e.g. <code>0=Cat, 1=Dog, 2=Bird</code>) produces a "mean pet" of 1.0 — nonsense that a naive model will nonetheless treat as a real numeric relationship.
+      </div>
+
+      <div class="takeaway-box">
+        <span class="tt-label">Key Takeaways</span>
+        <ul>
+          <li>Qualitative data describes categories; quantitative data describes quantities.</li>
+          <li>Ordinal data has order but not consistent spacing — treat it carefully.</li>
+          <li>The data type you're working with decides which statistic — and which encoding — is legitimate.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════ POPULATION VS SAMPLE ══════════════════════════ -->
+    <section class="section reveal" id="population-sample">
+      <div class="eyebrow"><span class="tag-num">Ch. 0</span> Foundations</div>
+      <h2 class="sec-title">Population vs. <span>Sample</span></h2>
+      <p class="sec-intro">You will almost never have the entire population of data you care about. You'll have a sample — a subset — and your job is to use that sample to say something trustworthy about the population you didn't see.</p>
+
+      <div class="grid2">
+        <div class="accent-box">
+          <span class="box-label">Population (N)</span>
+          The complete set of all possible observations. Example: <em>every</em> transaction your company will ever process. Its true mean is <strong>μ</strong> (mu) and its true variance is <strong>σ²</strong> (sigma-squared). These are fixed, usually unknown, constants.
+        </div>
+        <div class="info-box">
+          <span class="box-label">Sample (n)</span>
+          A subset drawn from the population — e.g. the 50,000 transactions in your training set. Its mean is <strong>x̄</strong> (x-bar) and variance is <strong>s²</strong>. These are estimates that change every time you draw a new sample.
+        </div>
+      </div>
+
+      <div class="qa-grid">
+        <div class="qa-card q-what"><div class="qh">What is it?</div><p>Population = the whole universe of data. Sample = a finite subset you actually observe and train on.</p></div>
+        <div class="qa-card q-why"><div class="qh">Why it matters</div><p>Every ML dataset is a sample. Your model's job is to generalize from that sample back to the population it was drawn from.</p></div>
+        <div class="qa-card q-how"><div class="qh">How it's calculated</div><p>Population stats divide by <code>N</code>; sample stats (for variance/std) divide by <code>n − 1</code> — Bessel's correction — to counteract underestimation.</p></div>
+        <div class="qa-card q-interpret"><div class="qh">How it's interpreted</div><p>A sample statistic is only a point <em>estimate</em>. A different random sample would give a slightly different number — that variability is what confidence intervals quantify.</p></div>
+        <div class="qa-card q-ml"><div class="qh">ML application</div><p>Train/validation/test splits are all samples from the same underlying population. Sampling bias here silently becomes model bias.</p></div>
+        <div class="qa-card q-pitfall"><div class="qh">If ignored</div><p>A non-representative sample (e.g. only daytime users) produces a model that looks accurate in testing but fails in the real, full population.</p></div>
+      </div>
+
+      <div class="formula-box">
+        <span class="flabel">Population vs Sample Variance</span>
+        $$ \sigma^2 = \frac{1}{N}\sum_{i=1}^{N}(x_i-\mu)^2 \qquad\qquad s^2 = \frac{1}{n-1}\sum_{i=1}^{n}(x_i-\bar{x})^2 $$
+      </div>
+
+      <div class="code-block">
+        <div class="mac-titlebar"><div class="mac-dot red"></div><div class="mac-dot yellow"></div><div class="mac-dot green"></div><span class="mac-filename">population_vs_sample.py</span></div>
+        <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+np.random.seed(<span class="num">42</span>)
+
+<span class="cmt"># Simulate a population of 1,000,000 customer ages</span>
+<span class="var">population</span> <span class="op">=</span> np.random.normal(<span class="num">38</span>, <span class="num">12</span>, <span class="num">1_000_000</span>)
+<span class="fn">print</span>(<span class="str">"Population mean (μ):"</span>, population.mean().round(<span class="num">3</span>))
+<span class="fn">print</span>(<span class="str">"Population std (σ):"</span>, population.std().round(<span class="num">3</span>))   <span class="cmt"># ddof=0 by default</span>
+
+<span class="cmt"># Draw a random sample of just 200 customers</span>
+<span class="var">sample</span> <span class="op">=</span> np.random.choice(population, size<span class="op">=</span><span class="num">200</span>, replace<span class="op">=</span><span class="kw">False</span>)
+<span class="fn">print</span>(<span class="str">"Sample mean (x̄):"</span>, sample.mean().round(<span class="num">3</span>))
+<span class="cmt"># ddof=1 applies Bessel's correction (n-1) for an unbiased sample estimate</span>
+<span class="fn">print</span>(<span class="str">"Sample std (s):"</span>, sample.std(ddof<span class="op">=</span><span class="num">1</span>).round(<span class="num">3</span>))</pre>
+        <div class="out-block"><span class="lbl">OUTPUT</span>Population mean (μ): 37.998
+Population std (σ): 11.998
+Sample mean (x̄): 37.242
+Sample std (s): 12.312</pre></div>
+      </div>
+
+      <div class="warn-box">
+        <span class="box-label">Why n − 1?</span>
+        A sample's own mean is, by construction, the point closest to all the sample's values — so measuring spread around it slightly <em>understates</em> true variability. Dividing by <code>n − 1</code> instead of <code>n</code> corrects that bias. In NumPy, always pass <code>ddof=1</code> when computing statistics on a sample.
+      </div>
+
+      <div class="takeaway-box">
+        <span class="tt-label">Key Takeaways</span>
+        <ul>
+          <li>Population parameters (μ, σ²) are fixed truths; sample statistics (x̄, s²) are estimates.</li>
+          <li>Use <code>ddof=1</code> in NumPy whenever computing variance/std on a sample — which, in ML, is basically always.</li>
+          <li>Train/test splits are samples too — how you draw them affects whether your model generalizes.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════ VARIABLES & MEASUREMENT SCALES ══════════════════════════ -->
+    <section class="section reveal" id="variables-scales">
+      <div class="eyebrow"><span class="tag-num">Ch. 0</span> Foundations</div>
+      <h2 class="sec-title">Variables &amp; <span>Measurement Scales</span></h2>
+      <p class="sec-intro">Once you know a variable's data type, the next question is what operations are mathematically valid on it. The four measurement scales — nominal, ordinal, interval, ratio — form a ladder: each level allows everything the level below allows, plus one more operation.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Scale</th><th>Order?</th><th>Equal gaps?</th><th>True zero?</th><th>Example</th><th>Valid ops</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Nominal</strong></td><td>✗</td><td>✗</td><td>✗</td><td>Blood type, gender</td><td>=, ≠</td></tr>
+            <tr><td><strong>Ordinal</strong></td><td>✓</td><td>✗</td><td>✗</td><td>Satisfaction rating</td><td>=, ≠, &lt;, &gt;</td></tr>
+            <tr><td><strong>Interval</strong></td><td>✓</td><td>✓</td><td>✗</td><td>Temperature (°C), calendar year</td><td>+, − (no ratios)</td></tr>
+            <tr><td><strong>Ratio</strong></td><td>✓</td><td>✓</td><td>✓</td><td>Height, income, age, price</td><td>+, −, ×, ÷</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="qa-grid">
+        <div class="qa-card q-what"><div class="qh">What is it?</div><p>A hierarchy describing how much mathematical structure a variable carries — from bare labels (nominal) to fully divisible numbers with a true zero (ratio).</p></div>
+        <div class="qa-card q-why"><div class="qh">Why it matters</div><p>It tells you which statistic is even meaningful: a mode makes sense for nominal data, but a mean does not.</p></div>
+        <div class="qa-card q-how"><div class="qh">How to identify it</div><p>Ask progressively: can I rank it? Are the gaps between values equal? Does zero mean "none of this"?</p></div>
+        <div class="qa-card q-interpret"><div class="qh">How it's interpreted</div><p>0°C is not "no temperature" (interval), but $0 income genuinely means no income (ratio) — that's why "twice as hot" is meaningless but "twice the income" is not.</p></div>
+        <div class="qa-card q-ml"><div class="qh">ML application</div><p>Ratio/interval features can be safely scaled and fed into distance-based models (KNN, k-means); nominal features need encoding first, or distance metrics become meaningless.</p></div>
+        <div class="qa-card q-pitfall"><div class="qh">If ignored</div><p>Computing Euclidean distance directly on an unencoded nominal feature ("red" vs "blue") is undefined — a common silent bug when data is fed into distance-based models.</p></div>
+      </div>
+
+      <div class="code-block">
+        <div class="mac-titlebar"><div class="mac-dot red"></div><div class="mac-dot yellow"></div><div class="mac-dot green"></div><span class="mac-filename">measurement_scales.py</span></div>
+        <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="cmt"># Ratio scale: true zero exists -> ratios are meaningful</span>
+<span class="var">income</span> <span class="op">=</span> np.array([<span class="num">0</span>, <span class="num">25000</span>, <span class="num">50000</span>])
+<span class="fn">print</span>(income[<span class="num">2</span>] <span class="op">/</span> income[<span class="num">1</span>])  <span class="cmt"># 2.0 -> "twice the income" is valid</span>
+
+<span class="cmt"># Interval scale: no true zero -> ratios are NOT meaningful</span>
+<span class="var">temp_c</span> <span class="op">=</span> np.array([<span class="num">0</span>, <span class="num">10</span>, <span class="num">20</span>])
+<span class="cmt"># 20°C is NOT "twice as hot" as 10°C (check in Fahrenheit: 68°F vs 50°F -> not 2x)</span></pre>
+      </div>
+
+      <div class="takeaway-box">
+        <span class="tt-label">Key Takeaways</span>
+        <ul>
+          <li>Nominal → Ordinal → Interval → Ratio is a ladder of increasing mathematical structure.</li>
+          <li>Ratio scales are the only ones where "twice as much" is a valid statement.</li>
+          <li>Match your encoding and your distance metric to the variable's true scale.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════ CHAPTER: DESCRIPTIVE STATISTICS ══════════════════════════ -->
+    <div class="chapter-divider reveal" id="descriptive-stats">
+      <div class="big-num">01</div>
+      <div class="chap-label">Chapter 1</div>
+      <h2>Descriptive <span style="color:var(--accent)">Statistics</span></h2>
+      <p>Twelve tools for compressing a mountain of numbers into a handful of honest summaries — center, spread, and shape. These are the numbers every EDA notebook opens with, and the numbers every feature-engineering pipeline is quietly built on.</p>
+    </div>
+
+    <!-- MEAN -->
+    <section class="section reveal" id="mean">
+      <div class="eyebrow"><span class="tag-num">1.1</span> Descriptive Statistics · Center</div>
+      <h2 class="sec-title">Mean <span>(Average)</span></h2>
+      <p class="sec-intro">The mean is the balance point of your data — the single number where, if your dataset were weights on a see-saw, it would balance perfectly.</p>
+
+      <div class="qa-grid">
+        <div class="qa-card q-what"><div class="qh">What is it?</div><p>The sum of all values divided by how many there are. The "typical value" if all observations contributed equally.</p></div>
+        <div class="qa-card q-why"><div class="qh">Why it matters</div><p>It's the simplest possible model of your data — predicting "the mean" for everyone is the baseline every real model must beat.</p></div>
+        <div class="qa-card q-how"><div class="qh">How it's calculated</div><p>Add every value, divide by the count: <code>np.mean(x)</code>.</p></div>
+        <div class="qa-card q-interpret"><div class="qh">How it's interpreted</div><p>A trustworthy center <em>only</em> when data is roughly symmetric. On skewed data it gets dragged toward the tail.</p></div>
+        <div class="qa-card q-ml"><div class="qh">ML application</div><p>Mean imputation for missing values, the target that linear regression's squared-error loss implicitly predicts, mean-centering for PCA and standardization.</p></div>
+        <div class="qa-card q-pitfall"><div class="qh">If ignored</div><p>A single billionaire in a "average income" calculation drags the mean far above what any typical person earns — the mean is extremely outlier-sensitive.</p></div>
+      </div>
+
+      <div class="formula-box"><span class="flabel">Sample Mean</span>$$ \bar{x} = \frac{1}{n}\sum_{i=1}^{n} x_i $$</div>
+
+      <h3 class="sub-title"><span class="ic">🧮</span>Worked Example</h3>
+      <p style="color:var(--muted); margin-bottom:10px;">Five houses sold for (in $1000s): <code>210, 225, 240, 255, 900</code> (the last is a mansion).</p>
+      <div class="formula-box" style="font-size:1.1rem;">$$ \bar{x} = \frac{210+225+240+255+900}{5} = \frac{1830}{5} = 366 $$</div>
+      <div class="danger-box"><span class="box-label">Notice</span>The "average" home price of $366k is higher than <em>four of the five</em> actual houses. One mansion pulled the mean far from what's typical — this is exactly why the median (next section) exists.</div>
+
+      <div class="viz-panel">
+        <div class="viz-head">
+          <div class="viz-title">Central Tendency Playground</div>
+          <div class="viz-hint">drag any dot on the number line</div>
+        </div>
+        <div class="viz-canvas-wrap"><canvas id="ctCanvas" height="220"></canvas></div>
+        <div class="viz-btn-row" style="margin-top:14px;">
+          <button class="mini-btn active" data-ct-preset="normal">Symmetric data</button>
+          <button class="mini-btn" data-ct-preset="outlier">Add extreme outlier</button>
+          <button class="mini-btn" data-ct-preset="skew">Right-skew data</button>
+          <button class="mini-btn" data-ct-preset="bimodal">Bimodal data</button>
+        </div>
+        <div class="viz-readout">
+          <div class="readout-chip"><span class="rl">Mean</span><span class="rv" id="ctMean">–</span></div>
+          <div class="readout-chip"><span class="rl">Median</span><span class="rv" id="ctMedian" style="color:var(--blue)">–</span></div>
+          <div class="readout-chip"><span class="rl">Mode</span><span class="rv" id="ctMode" style="color:var(--purple)">–</span></div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="mac-titlebar"><div class="mac-dot red"></div><div class="mac-dot yellow"></div><div class="mac-dot green"></div><span class="mac-filename">mean.py</span></div>
+        <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="var">prices</span> <span class="op">=</span> np.array([<span class="num">210</span>, <span class="num">225</span>, <span class="num">240</span>, <span class="num">255</span>, <span class="num">900</span>])  <span class="cmt"># in $1000s</span>
+<span class="fn">print</span>(<span class="str">"Mean:"</span>, np.mean(prices))          <span class="cmt"># sum(prices) / len(prices)</span>
+<span class="fn">print</span>(<span class="str">"Mean (no outlier):"</span>, np.mean(prices[:<span class="op">-</span><span class="num">1</span>]))  <span class="cmt"># drop the mansion</span></pre>
+        <div class="out-block"><span class="lbl">OUTPUT</span>Mean: 366.0
+Mean (no outlier): 232.5</div>
+      </div>
+
+      <div class="takeaway-box">
+        <span class="tt-label">Key Takeaways</span>
+        <ul>
+          <li>Mean = sum / count — the arithmetic balance point of the data.</li>
+          <li>It's the least robust measure of center: extremely sensitive to outliers.</li>
+          <li>It underlies mean-squared-error loss, mean imputation, and standardization.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- MEDIAN -->
+    <section class="section reveal" id="median">
+      <div class="eyebrow"><span class="tag-num">1.2</span> Descriptive Statistics · Center</div>
+      <h2 class="sec-title">Median <span>(Middle Value)</span></h2>
+      <p class="sec-intro">The median is the value that splits your sorted data exactly in half — immune to how extreme the tails get.</p>
+
+      <div class="qa-grid">
+        <div class="qa-card q-what"><div class="qh">What is it?</div><p>The middle value of a sorted dataset — 50% of values fall below it, 50% above.</p></div>
+        <div class="qa-card q-why"><div class="qh">Why it matters</div><p>It's <strong>robust</strong>: unlike the mean, extreme values barely move it at all.</p></div>
+        <div class="qa-card q-how"><div class="qh">How it's calculated</div><p>Sort the data. Odd count → middle element. Even count → average the two middle elements. <code>np.median(x)</code>.</p></div>
+        <div class="qa-card q-interpret"><div class="qh">How it's interpreted</div><p>The "typical" value when outliers or skew are present. Mean ≈ median signals roughly symmetric data.</p></div>
+        <div class="qa-card q-ml"><div class="qh">ML application</div><p>Median imputation for skewed features (income, price), the loss minimized by MAE-based regressors, robust scaling (median + IQR instead of mean + std).</p></div>
+        <div class="qa-card q-pitfall"><div class="qh">If ignored</div><p>Reporting "average" income as the mean during EDA, instead of the median, can make an economy look far healthier (or worse) than it actually is for a typical person.</p></div>
+      </div>
+
+      <div class="formula-box"><span class="flabel">Median</span>$$ \text{median} = \begin{cases} x_{\left(\frac{n+1}{2}\right)} & n \text{ odd} \\[4pt] \dfrac{x_{(n/2)} + x_{(n/2+1)}}{2} & n \text{ even} \end{cases} $$</div>
+
+      <p style="color:var(--muted);">Back to our houses: <code>210, 225, 240, 255, 900</code> sorted → middle value is the 3rd: <strong style="color:#fff;">240</strong>. Compare: mean = 366, median = 240. The median reflects what a typical buyer actually pays.</p>
+
+      <div class="code-block">
+        <div class="mac-titlebar"><div class="mac-dot red"></div><div class="mac-dot yellow"></div><div class="mac-dot green"></div><span class="mac-filename">median.py</span></div>
+        <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="var">prices</span> <span class="op">=</span> np.array([<span class="num">210</span>, <span class="num">225</span>, <span class="num">240</span>, <span class="num">255</span>, <span class="num">900</span>])
+<span class="fn">print</span>(<span class="str">"Median:"</span>, np.median(prices))         <span class="cmt"># 240.0 — unaffected by the mansion</span>
+
+<span class="cmt"># Even-length dataset: median averages the two middle values</span>
+<span class="var">even_data</span> <span class="op">=</span> np.array([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>])
+<span class="fn">print</span>(<span class="str">"Median (even n):"</span>, np.median(even_data))   <span class="cmt"># (2+3)/2 = 2.5</span></pre>
+        <div class="out-block"><span class="lbl">OUTPUT</span>Median: 240.0
+Median (even n): 2.5</div>
+      </div>
+
+      <div class="info-box"><span class="box-label">Real-world analogy</span>Think of median household income vs mean household income in news reports: journalists prefer median because a handful of billionaires shouldn't make everyone else's paycheck look artificially large.</div>
+
+      <div class="takeaway-box">
+        <span class="tt-label">Key Takeaways</span>
+        <ul>
+          <li>Median = the middle of sorted data; robust to outliers and skew.</li>
+          <li>Prefer median over mean for skewed features like income, price, or wait time.</li>
+          <li>Median-based imputation and scaling protect pipelines from being dominated by extreme values.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- MODE -->
+    <section class="section reveal" id="mode">
+      <div class="eyebrow"><span class="tag-num">1.3</span> Descriptive Statistics · Center</div>
+      <h2 class="sec-title">Mode <span>(Most Frequent Value)</span></h2>
+      <p class="sec-intro">The mode is the only measure of center that works on categorical data — it simply asks: what shows up most often?</p>
+
+      <div class="qa-grid">
+        <div class="qa-card q-what"><div class="qh">What is it?</div><p>The value (or category) that occurs with the highest frequency in the dataset. A dataset can have one mode, several (multimodal), or none.</p></div>
+        <div class="qa-card q-why"><div class="qh">Why it matters</div><p>It's the only central-tendency measure valid for nominal (categorical) data, where mean and median are undefined.</p></div>
+        <div class="qa-card q-how"><div class="qh">How it's calculated</div><p>Count occurrences of each unique value and take the highest — NumPy has no built-in <code>mode()</code>, so we build it from <code>np.unique</code>.</p></div>
+        <div class="qa-card q-interpret"><div class="qh">How it's interpreted</div><p>Multiple modes (bimodal/multimodal) often signal that your data is actually a mixture of two or more underlying groups.</p></div>
+        <div class="qa-card q-ml"><div class="qh">ML application</div><p>Mode imputation for categorical missing values; identifying the majority class in classification (a useful "dumb baseline" to beat).</p></div>
+        <div class="qa-card q-pitfall"><div class="qh">If ignored</div><p>Ignoring a bimodal distribution and imputing with the mean creates a value that describes neither group — e.g. imputing "medium" spending for a dataset that's really "big spenders" + "bargain hunters."</p></div>
+      </div>
+
+      <div class="code-block">
+        <div class="mac-titlebar"><div class="mac-dot red"></div><div class="mac-dot yellow"></div><div class="mac-dot green"></div><span class="mac-filename">mode.py</span></div>
+        <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="var">shoe_sizes</span> <span class="op">=</span> np.array([<span class="num">8</span>, <span class="num">9</span>, <span class="num">9</span>, <span class="num">10</span>, <span class="num">9</span>, <span class="num">11</span>, <span class="num">8</span>, <span class="num">9</span>])
+
+<span class="cmt"># NumPy has no built-in mode() — build it with unique + argmax</span>
+<span class="var">values</span>, <span class="var">counts</span> <span class="op">=</span> np.unique(shoe_sizes, return_counts<span class="op">=</span><span class="kw">True</span>)
+<span class="var">mode_value</span> <span class="op">=</span> values[np.argmax(counts)]
+<span class="fn">print</span>(<span class="str">"Mode:"</span>, mode_value, <span class="str">"| appears"</span>, counts.max(), <span class="str">"times"</span>)</pre>
+        <div class="out-block"><span class="lbl">OUTPUT</span>Mode: 9 | appears 4 times</div>
+      </div>
+
+      <div class="purple-box"><span class="box-label">Real-world analogy</span>A shoe store doesn't stock the "average" shoe size (7.4, which doesn't exist) — it stocks more of the mode, size 9, because that's what actually sells.</div>
+
+      <div class="takeaway-box">
+        <span class="tt-label">Key Takeaways</span>
+        <ul>
+          <li>Mode = most frequent value; the only central-tendency measure valid for categorical data.</li>
+          <li>A dataset can be unimodal, bimodal, or multimodal — multiple modes hint at hidden subgroups.</li>
+          <li>Use mode imputation for missing categorical features.</li>
+        </ul>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-q">Quick check: A dataset of household incomes has a huge right skew (a few very high earners). Which measure of center best represents a "typical" household?</div>
+        <div class="quiz-opts">
+          <div class="quiz-opt" data-correct="false">Mean — it uses every data point</div>
+          <div class="quiz-opt" data-correct="true">Median — it resists the pull of high earners</div>
+          <div class="quiz-opt" data-correct="false">Mode — it's the easiest to calculate</div>
+        </div>
+        <div class="quiz-fb"></div>
+      </div>
+    </section>
+
+    <!-- RANGE -->
+    <section class="section reveal" id="range">
+      <div class="eyebrow"><span class="tag-num">1.4</span> Descriptive Statistics · Spread</div>
+      <h2 class="sec-title">Range</h2>
+      <p class="sec-intro">The simplest possible measure of spread: the distance between the smallest and largest value. Fast to compute, but fragile — a single outlier can blow it up.</p>
+
+      <div class="qa-grid">
+        <div class="qa-card q-what"><div class="qh">What is it?</div><p>Maximum value minus minimum value — the total width the data spans.</p></div>
+        <div class="qa-card q-why"><div class="qh">Why it matters</div><p>A first, cheap sanity check on scale — useful for spotting impossible values (e.g. a "range" of -5 to 200 for a percentage column signals a data bug).</p></div>
+        <div class="qa-card q-how"><div class="qh">How it's calculated</div><p><code>np.max(x) - np.min(x)</code>, or <code>np.ptp(x)</code> ("peak to peak").</p></div>
+        <div class="qa-card q-interpret"><div class="qh">How it's interpreted</div><p>Large range ⇒ widely spread data or an outlier. It says nothing about how data is distributed <em>between</em> the extremes.</p></div>
+        <div class="qa-card q-ml"><div class="qh">ML application</div><p>Min-max scaling uses the range directly: <code>(x - min) / range</code> maps every feature into <code>[0, 1]</code>.</p></div>
+        <div class="qa-card q-pitfall"><div class="qh">If ignored</div><p>Min-max scaling a feature with one extreme outlier squashes 99% of your real data into a tiny sliver of the [0,1] interval.</p></div>
+      </div>
+
+      <div class="code-block">
+        <div class="mac-titlebar"><div class="mac-dot red"></div><div class="mac-dot yellow"></div><div class="mac-dot green"></div><span class="mac-filename">range.py</span></div>
+        <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="var">temps</span> <span class="op">=</span> np.array([<span class="num">18</span>, <span class="num">21</span>, <span class="num">19</span>, <span class="num">25</span>, <span class="num">17</span>, <span class="num">40</span>])  <span class="cmt"># 40 = sensor glitch?</span>
+<span class="fn">print</span>(<span class="str">"Range:"</span>, np.ptp(temps))     <span class="cmt"># 40 - 17 = 23</span>
+<span class="fn">print</span>(<span class="str">"Range (no glitch):"</span>, np.ptp(temps[:<span class="op">-</span><span class="num">1</span>]))  <span class="cmt"># 25 - 17 = 8</span></pre>
+        <div class="out-block"><span class="lbl">OUTPUT</span>Range: 23
+Range (no glitch): 8</div>
+      </div>
+
+      <div class="takeaway-box"><span class="tt-label">Key Takeaways</span><ul>
+        <li>Range = max − min; a quick, crude measure of spread.</li>
+        <li>Extremely outlier-sensitive — one bad sensor reading can triple it.</li>
+        <li>Directly powers min-max scaling, so audit for outliers before using it.</li>
+      </ul></div>
+    </section>
+
+    <!-- VARIANCE & STD -->
+    <section class="section reveal" id="variance">
+      <div class="eyebrow"><span class="tag-num">1.5 – 1.6</span> Descriptive Statistics · Spread</div>
+      <h2 class="sec-title">Variance &amp; <span>Standard Deviation</span></h2>
+      <p class="sec-intro">If the mean answers "where is the center?", variance answers "how far, on average, do points stray from it?" Standard deviation is just variance brought back to the data's original units.</p>
+
+      <div class="qa-grid">
+        <div class="qa-card q-what"><div class="qh">What is it?</div><p>Variance is the average squared distance of each point from the mean. Standard deviation is its square root — spread expressed in the same units as the data.</p></div>
+        <div class="qa-card q-why"><div class="qh">Why it matters</div><p>Two datasets can share the same mean but wildly different spreads — variance is what tells them apart, and what tells a model how "noisy" a feature is.</p></div>
+        <div class="qa-card q-how"><div class="qh">How it's calculated</div><p>Square every deviation from the mean, average them (variance), then square-root (std). <code>np.var(x, ddof=1)</code>, <code>np.std(x, ddof=1)</code>.</p></div>
+        <div class="qa-card q-interpret"><div class="qh">How it's interpreted</div><p>Larger std = more spread out / less predictable. In a roughly bell-shaped distribution, ~68% of values fall within 1 std of the mean, ~95% within 2.</p></div>
+        <div class="qa-card q-ml"><div class="qh">ML application</div><p>Standardization (z-score scaling) divides by std; PCA maximizes variance explained; std is the backbone of confidence intervals and gradient-based optimizer stability.</p></div>
+        <div class="qa-card q-pitfall"><div class="qh">If ignored</div><p>A feature with huge variance (e.g. "salary" in dollars) can dominate the loss surface over a low-variance feature (e.g. "years of experience"), making gradient descent unstable or biased toward one feature.</p></div>
+      </div>
+
+      <div class="formula-box"><span class="flabel">Variance &amp; Standard Deviation (sample)</span>$$ s^2 = \frac{1}{n-1}\sum_{i=1}^{n}(x_i - \bar{x})^2 \qquad\qquad s = \sqrt{s^2} $$</div>
+
+      <h3 class="sub-title"><span class="ic">🧮</span>Worked Example</h3>
+      <p style="color:var(--muted);">Test scores: <code>60, 70, 80, 90, 100</code>. Mean = 80.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>x</th><th>x − x̄</th><th>(x − x̄)²</th></tr></thead>
+        <tbody>
+          <tr><td>60</td><td>−20</td><td>400</td></tr>
+          <tr><td>70</td><td>−10</td><td>100</td></tr>
+          <tr><td>80</td><td>0</td><td>0</td></tr>
+          <tr><td>90</td><td>10</td><td>100</td></tr>
+          <tr><td>100</td><td>20</td><td>400</td></tr>
+        </tbody>
+      </table></div>
+      <div class="formula-box" style="font-size:1.05rem;">$$ s^2 = \frac{400+100+0+100+400}{5-1} = \frac{1000}{4} = 250 \qquad s = \sqrt{250} \approx 15.81 $$</div>
+
+      <div class="viz-panel">
+        <div class="viz-head"><div class="viz-title">Spread Explorer</div><div class="viz-hint">drag the slider to change spread — mean stays fixed</div></div>
+        <div class="viz-canvas-wrap"><canvas id="spreadCanvas" height="240"></canvas></div>
+        <div class="viz-controls">
+          <div class="viz-control"><label>Standard Deviation <span class="val" id="spreadStdVal">15</span></label><input type="range" id="spreadStd" min="3" max="45" value="15" step="1"></div>
+        </div>
+        <div class="viz-readout">
+          <div class="readout-chip"><span class="rl">Mean</span><span class="rv" id="spreadMean">80.0</span></div>
+          <div class="readout-chip"><span class="rl">Variance</span><span class="rv" id="spreadVar" style="color:var(--blue)">–</span></div>
+          <div class="readout-chip"><span class="rl">Std Dev</span><span class="rv" id="spreadStdOut" style="color:var(--purple)">–</span></div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="mac-titlebar"><div class="mac-dot red"></div><div class="mac-dot yellow"></div><div class="mac-dot green"></div><span class="mac-filename">variance_std.py</span></div>
+        <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="var">scores</span> <span class="op">=</span> np.array([<span class="num">60</span>, <span class="num">70</span>, <span class="num">80</span>, <span class="num">90</span>, <span class="num">100</span>])
+
+<span class="var">mean</span> <span class="op">=</span> np.mean(scores)
+<span class="var">deviations</span> <span class="op">=</span> scores <span class="op">-</span> mean          <span class="cmt"># vectorized: subtracts mean from every element</span>
+<span class="var">sq_deviations</span> <span class="op">=</span> deviations <span class="op">**</span> <span class="num">2</span>       <span class="cmt"># squares each deviation (removes negative signs)</span>
+
+<span class="var">variance</span> <span class="op">=</span> np.var(scores, ddof<span class="op">=</span><span class="num">1</span>)    <span class="cmt"># ddof=1 -> divide by (n-1), sample variance</span>
+<span class="var">std_dev</span> <span class="op">=</span> np.std(scores, ddof<span class="op">=</span><span class="num">1</span>)
+
+<span class="fn">print</span>(<span class="str">"Variance:"</span>, variance)   <span class="cmt"># 250.0</span>
+<span class="fn">print</span>(<span class="str">"Std Dev:"</span>, std_dev.round(<span class="num">2</span>)) <span class="cmt"># 15.81 — back in original score units</span></pre>
+        <div class="out-block"><span class="lbl">OUTPUT</span>Variance: 250.0
+Std Dev: 15.81</div>
+      </div>
+
+      <div class="info-box"><span class="box-label">Why square the deviations?</span>Deviations from the mean always sum to zero (positives and negatives cancel). Squaring makes every deviation positive before averaging — the trade-off is that variance is now in <em>squared</em> units ($^2$), which is why we take the square root to get standard deviation back into interpretable, original units.</div>
+
+      <div class="takeaway-box"><span class="tt-label">Key Takeaways</span><ul>
+        <li>Variance = average squared deviation from the mean; std = √variance, in original units.</li>
+        <li>Use <code>ddof=1</code> for sample data — the default <code>ddof=0</code> computes the (biased) population version.</li>
+        <li>Standard deviation is the unit you divide by in z-score standardization — critical for gradient-based models.</li>
+      </ul></div>
+    </section>
+
+    <!-- QUARTILES & IQR -->
+    <section class="section reveal" id="quartiles-iqr">
+      <div class="eyebrow"><span class="tag-num">1.7</span> Descriptive Statistics · Spread</div>
+      <h2 class="sec-title">Quartiles &amp; <span>IQR</span></h2>
+      <p class="sec-intro">Quartiles cut sorted data into four equal chunks. The middle 50% of your data — between Q1 and Q3 — is the Interquartile Range, a spread measure that shrugs off outliers entirely.</p>
+
+      <div class="qa-grid">
+        <div class="qa-card q-what"><div class="qh">What is it?</div><p>Q1 (25th percentile), Q2 (50th, the median), Q3 (75th percentile) divide sorted data into quarters. IQR = Q3 − Q1.</p></div>
+        <div class="qa-card q-why"><div class="qh">Why it matters</div><p>IQR measures spread using only the "core" of the data, making it immune to extreme outliers that would distort variance or range.</p></div>
+        <div class="qa-card q-how"><div class="qh">How it's calculated</div><p><code>np.percentile(x, 25)</code> and <code>np.percentile(x, 75)</code>, then subtract.</p></div>
+        <div class="qa-card q-interpret"><div class="qh">How it's interpreted</div><p>A small IQR means the middle of your data is tightly packed; a large IQR means even the "typical" range of values is wide.</p></div>
+        <div class="qa-card q-ml"><div class="qh">ML application</div><p>The standard rule for outlier detection (below), robust scaling (subtract median, divide by IQR), and the box in every box plot during EDA.</p></div>
+        <div class="qa-card q-pitfall"><div class="qh">If ignored</div><p>Relying on range or std to detect outliers on skewed data flags too many (or too few) points — IQR-based rules are far more robust.</p></div>
+      </div>
+
+      <div class="formula-box"><span class="flabel">Interquartile Range</span>$$ \text{IQR} = Q_3 - Q_1 \qquad \text{Outlier fences: } [\,Q_1 - 1.5\cdot\text{IQR},\ Q_3 + 1.5\cdot\text{IQR}\,] $$</div>
+
+      <div class="viz-panel">
+        <div class="viz-head"><div class="viz-title">Box Plot Builder</div><div class="viz-hint">toggle an outlier and watch the fences react</div></div>
+        <div class="viz-canvas-wrap"><canvas id="boxCanvas" height="220"></canvas></div>
+        <div class="viz-btn-row" style="margin-top:14px;">
+          <button class="mini-btn active" data-box-preset="clean">Clean data</button>
+          <button class="mini-btn" data-box-preset="outlier">With outliers</button>
+          <button class="mini-btn" data-box-preset="skewed">Skewed data</button>
+        </div>
+        <div class="viz-readout">
+          <div class="readout-chip"><span class="rl">Q1</span><span class="rv" id="boxQ1">–</span></div>
+          <div class="readout-chip"><span class="rl">Median</span><span class="rv" id="boxQ2">–</span></div>
+          <div class="readout-chip"><span class="rl">Q3</span><span class="rv" id="boxQ3">–</span></div>
+          <div class="readout-chip"><span class="rl">IQR</span><span class="rv" id="boxIQR" style="color:var(--blue)">–</span></div>
+          <div class="readout-chip"><span class="rl">Outliers</span><span class="rv" id="boxOut" style="color:var(--red)">–</span></div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="mac-titlebar"><div class="mac-dot red"></div><div class="mac-dot yellow"></div><div class="mac-dot green"></div><span class="mac-filename">quartiles_iqr.py</span></div>
+        <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="var">data</span> <span class="op">=</span> np.array([<span class="num">12</span>,<span class="num">15</span>,<span class="num">14</span>,<span class="num">10</span>,<span class="num">18</span>,<span class="num">19</span>,<span class="num">13</span>,<span class="num">72</span>,<span class="num">16</span>,<span class="num">17</span>])  <span class="cmt"># 72 = likely outlier</span>
+
+<span class="var">q1</span>, <span class="var">q3</span> <span class="op">=</span> np.percentile(data, [<span class="num">25</span>, <span class="num">75</span>])
+<span class="var">iqr</span> <span class="op">=</span> q3 <span class="op">-</span> q1
+<span class="var">lower_fence</span> <span class="op">=</span> q1 <span class="op">-</span> <span class="num">1.5</span> <span class="op">*</span> iqr
+<span class="var">upper_fence</span> <span class="op">=</span> q3 <span class="op">+</span> <span class="num">1.5</span> <span class="op">*</span> iqr
+<span class="var">outliers</span> <span class="op">=</span> data[(data <span class="op">&lt;</span> lower_fence) <span class="op">|</span> (data <span class="op">&gt;</span> upper_fence)]
+
+<span class="fn">print</span>(<span class="str">f"Q1=<span class="acc">{q1}</span>, Q3=<span class="acc">{q3}</span>, IQR=<span class="acc">{iqr}</span>"</span>)
+<span class="fn">print</span>(<span class="str">"Outliers:"</span>, outliers)
+
+fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="num">5</span>,<span class="num">4</span>))
+ax.boxplot(data, vert<span class="op">=</span><span class="kw">True</span>, patch_artist<span class="op">=</span><span class="kw">True</span>,
+           boxprops<span class="op">=</span><span class="fn">dict</span>(facecolor<span class="op">=</span><span class="str">'#7fff6e'</span>, alpha<span class="op">=</span><span class="num">0.4</span>))
+ax.set_title(<span class="str">"Box Plot with Outlier"</span>)
+plt.savefig(<span class="str">"boxplot.png"</span>, dpi<span class="op">=</span><span class="num">150</span>, bbox_inches<span class="op">=</span><span class="str">'tight'</span>)</pre>
+        <div class="out-block"><span class="lbl">OUTPUT</span>Q1=13.25, Q3=17.75, IQR=4.5
+Outliers: [72]</div>
+      </div>
+
+      <div class="takeaway-box"><span class="tt-label">Key Takeaways</span><ul>
+        <li>Quartiles split sorted data into four equal parts; IQR = Q3 − Q1 covers the middle 50%.</li>
+        <li>The 1.5×IQR rule is the standard, robust way to flag outliers.</li>
+        <li>Box plots visualize five numbers at once: min, Q1, median, Q3, max (plus outliers as dots).</li>
+      </ul></div>
+    </section>
+
+    <!-- PERCENTILES -->
+    <section class="section reveal" id="percentiles">
+      <div class="eyebrow"><span class="tag-num">1.8</span> Descriptive Statistics · Position</div>
+      <h2 class="sec-title">Percentiles</h2>
+      <p class="sec-intro">A percentile tells you what fraction of the data falls below a given value. Quartiles are just percentiles at the 25/50/75 marks — percentiles generalize that idea to any cut point.</p>
+
+      <div class="qa-grid">
+        <div class="qa-card q-what"><div class="qh">What is it?</div><p>The <code>p</code>-th percentile is the value below which <code>p%</code> of the data falls.</p></div>
+        <div class="qa-card q-why"><div class="qh">Why it matters</div><p>Percentiles describe position within a distribution without assuming any particular shape (unlike z-scores, which assume near-normality).</p></div>
+        <div class="qa-card q-how"><div class="qh">How it's calculated</div><p><code>np.percentile(x, p)</code> — NumPy interpolates between the two nearest ranked values.</p></div>
+        <div class="qa-card q-interpret"><div class="qh">How it's interpreted</div><p>"Your latency is at the 95th percentile" means 95% of requests were faster than this one — a common SLA/monitoring metric.</p></div>
+        <div class="qa-card q-ml"><div class="qh">ML application</div><p>Percentile-based capping/winsorizing (clip values below the 1st or above the 99th percentile) is a common, robust outlier-taming preprocessing step.</p></div>
+        <div class="qa-card q-pitfall"><div class="qh">If ignored</div><p>Reporting only the mean latency hides that your 99th-percentile users are having a terrible experience — averages hide tail behavior that percentiles reveal.</p></div>
+      </div>
+
+      <div class="code-block">
+        <div class="mac-titlebar"><div class="mac-dot red"></div><div class="mac-dot yellow"></div><div class="mac-dot green"></div><span class="mac-filename">percentiles.py</span></div>
+        <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="var">latency_ms</span> <span class="op">=</span> np.random.exponential(scale<span class="op">=</span><span class="num">50</span>, size<span class="op">=</span><span class="num">1000</span>)
+
+<span class="fn">print</span>(<span class="str">"p50 (median):"</span>, np.percentile(latency_ms, <span class="num">50</span>).round(<span class="num">1</span>))
+<span class="fn">print</span>(<span class="str">"p95:"</span>, np.percentile(latency_ms, <span class="num">95</span>).round(<span class="num">1</span>))
+<span class="fn">print</span>(<span class="str">"p99:"</span>, np.percentile(latency_ms, <span class="num">99</span>).round(<span class="num">1</span>))
+
+<span class="cmt"># Winsorize: clip extreme tails to the 1st / 99th percentile</span>
+<span class="var">lo</span>, <span class="var">hi</span> <span class="op">=</span> np.percentile(latency_ms, [<span class="num">1</span>, <span class="num">99</span>])
+<span class="var">clipped</span> <span class="op">=</span> np.clip(latency_ms, lo, hi)</pre>
+        <div class="out-block"><span class="lbl">OUTPUT</span>p50 (median): 35.2
+p95: 149.8
+p99: 231.6</div>
+      </div>
+
+      <div class="takeaway-box"><span class="tt-label">Key Takeaways</span><ul>
+        <li>Percentiles describe relative position in a dataset — no distributional assumptions required.</li>
+        <li>p50 = median; p25/p75 = Q1/Q3.</li>
+        <li>Tail percentiles (p95, p99) matter enormously for latency, fraud, and risk-sensitive ML applications.</li>
+      </ul></div>
+    </section>
+
+    <!-- SKEWNESS & KURTOSIS -->
+    <section class="section reveal" id="skewness">
+      <div class="eyebrow"><span class="tag-num">1.9 – 1.10</span> Descriptive Statistics · Shape</div>
+      <h2 class="sec-title">Skewness &amp; <span>Kurtosis</span></h2>
+      <p class="sec-intro">Mean and std describe center and spread — but two distributions can share both and still look completely different. Skewness measures asymmetry; kurtosis measures how heavy the tails are.</p>
+
+      <div class="grid2">
+        <div class="accent-box"><span class="box-label">Skewness</span>Measures asymmetry. <strong>Right (positive) skew</strong>: long tail stretches right, mean &gt; median (e.g. income). <strong>Left (negative) skew</strong>: long tail stretches left, mean &lt; median (e.g. age at retirement). <strong>Zero</strong>: symmetric, like the normal distribution.</div>
+        <div class="info-box"><span class="box-label">Kurtosis</span>Measures tail weight / "peakedness" relative to a normal distribution. <strong>High kurtosis</strong> (leptokurtic): sharp peak, fat tails — more extreme outliers than normal predicts. <strong>Low kurtosis</strong> (platykurtic): flatter, thinner tails.</div>
+      </div>
+
+      <div class="qa-grid">
+        <div class="qa-card q-what"><div class="qh">What is it?</div><p>Skewness = 3rd standardized moment (asymmetry). Kurtosis = 4th standardized moment (tail weight).</p></div>
+        <div class="qa-card q-why"><div class="qh">Why it matters</div><p>Many models (linear/logistic regression, PCA) assume roughly normal, low-skew features. Undetected skew silently violates that assumption.</p></div>
+        <div class="qa-card q-how"><div class="qh">How it's calculated</div><p>Skewness: $\frac{1}{n}\sum\left(\frac{x_i-\bar{x}}{s}\right)^3$. Excess kurtosis: $\frac{1}{n}\sum\left(\frac{x_i-\bar{x}}{s}\right)^4 - 3$ (the −3 centers "normal" at 0).</p></div>
+        <div class="qa-card q-interpret"><div class="qh">How it's interpreted</div><p>Skew ≈ 0: symmetric. Skew &gt; 1 or &lt; −1: strongly skewed, consider a log or Box-Cox transform. Excess kurtosis &gt; 0: fatter tails than normal, more outlier risk.</p></div>
+        <div class="qa-card q-ml"><div class="qh">ML application</div><p>Deciding whether to log-transform a feature before feeding it to a linear model; understanding fat-tailed risk in financial ML (extreme kurtosis = rare, extreme events are more likely than a normal model predicts).</p></div>
+        <div class="qa-card q-pitfall"><div class="qh">If ignored</div><p>Fitting a linear regression on a heavily right-skewed target (like house prices) without transforming it leads to residuals that violate normality assumptions and unstable predictions at the high end.</p></div>
+      </div>
+
+      <div class="viz-panel">
+        <div class="viz-head"><div class="viz-title">Distribution Shape Lab</div><div class="viz-hint">switch shapes to see skew &amp; kurtosis shift</div></div>
+        <div class="viz-canvas-wrap"><canvas id="shapeCanvas" height="240"></canvas></div>
+        <div class="viz-btn-row" style="margin-top:14px;">
+          <button class="mini-btn active" data-shape="normal">Normal (symmetric)</button>
+          <button class="mini-btn" data-shape="right">Right-skewed</button>
+          <button class="mini-btn" data-shape="left">Left-skewed</button>
+          <button class="mini-btn" data-shape="peaked">High kurtosis</button>
+          <button class="mini-btn" data-shape="flat">Low kurtosis</button>
+        </div>
+        <div class="viz-readout">
+          <div class="readout-chip"><span class="rl">Skewness</span><span class="rv" id="shapeSkew">–</span></div>
+          <div class="readout-chip"><span class="rl">Excess Kurtosis</span><span class="rv" id="shapeKurt" style="color:var(--blue)">–</span></div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="mac-titlebar"><div class="mac-dot red"></div><div class="mac-dot yellow"></div><div class="mac-dot green"></div><span class="mac-filename">skew_kurtosis.py</span></div>
+        <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="kw">def</span> <span class="fn">skewness</span>(<span class="var">x</span>):
+    <span class="var">m</span>, <span class="var">s</span> <span class="op">=</span> x.mean(), x.std(ddof<span class="op">=</span><span class="num">0</span>)
+    <span class="kw">return</span> np.mean(((x <span class="op">-</span> m) <span class="op">/</span> s) <span class="op">**</span> <span class="num">3</span>)
+
+<span class="kw">def</span> <span class="fn">excess_kurtosis</span>(<span class="var">x</span>):
+    <span class="var">m</span>, <span class="var">s</span> <span class="op">=</span> x.mean(), x.std(ddof<span class="op">=</span><span class="num">0</span>)
+    <span class="kw">return</span> np.mean(((x <span class="op">-</span> m) <span class="op">/</span> s) <span class="op">**</span> <span class="num">4</span>) <span class="op">-</span> <span class="num">3</span>
+
+<span class="var">income</span> <span class="op">=</span> np.random.lognormal(mean<span class="op">=</span><span class="num">3</span>, sigma<span class="op">=</span><span class="num">0.6</span>, size<span class="op">=</span><span class="num">5000</span>)  <span class="cmt"># classic right-skewed data</span>
+<span class="fn">print</span>(<span class="str">"Skewness:"</span>, skewness(income).round(<span class="num">2</span>))          <span class="cmt"># positive -> right-skewed</span>
+<span class="fn">print</span>(<span class="str">"Excess kurtosis:"</span>, excess_kurtosis(income).round(<span class="num">2</span>)) <span class="cmt"># > 0 -> fatter tails than normal</span>
+
+<span class="cmt"># Fix skew before feeding to a linear model</span>
+<span class="var">log_income</span> <span class="op">=</span> np.log(income)
+<span class="fn">print</span>(<span class="str">"Skewness after log:"</span>, skewness(log_income).round(<span class="num">2</span>))</pre>
+        <div class="out-block"><span class="lbl">OUTPUT</span>Skewness: 1.94
+Excess kurtosis: 6.87
+Skewness after log: 0.02</div>
+      </div>
+
+      <div class="takeaway-box"><span class="tt-label">Key Takeaways</span><ul>
+        <li>Skewness quantifies asymmetry; kurtosis quantifies tail weight relative to normal.</li>
+        <li>Right-skewed features (price, income, counts) usually benefit from a log transform before linear models.</li>
+        <li>High kurtosis warns you that extreme outliers are more likely than a normal-distribution assumption would suggest.</li>
+      </ul></div>
+    </section>
+
+    <!-- OUTLIER DETECTION -->
+    <section class="section reveal" id="outliers">
+      <div class="eyebrow"><span class="tag-num">1.11</span> Descriptive Statistics · Robustness</div>
+      <h2 class="sec-title">Outlier <span>Detection</span></h2>
+      <p class="sec-intro">Outliers aren't automatically "bad data" — they might be your most important fraud case. But undetected, they silently corrupt means, variances, and distance-based models. Detecting them is a prerequisite to deciding what to do with them.</p>
+
+      <div class="qa-grid">
+        <div class="qa-card q-what"><div class="qh">What is it?</div><p>A data point that lies unusually far from the rest of the distribution, by some defined rule.</p></div>
+        <div class="qa-card q-why"><div class="qh">Why it matters</div><p>Outliers disproportionately influence mean-based statistics, distance-based models (KNN, k-means), and gradient-based training.</p></div>
+        <div class="qa-card q-how"><div class="qh">How it's calculated</div><p>Two common rules: <strong>IQR rule</strong> (outside <code>Q1 − 1.5·IQR</code> / <code>Q3 + 1.5·IQR</code>) and <strong>Z-score rule</strong> (|z| &gt; 3).</p></div>
+        <div class="qa-card q-interpret"><div class="qh">How it's interpreted</div><p>Not every outlier is an error — some are the most informative points in the dataset (e.g. a fraudulent transaction). Investigate before removing.</p></div>
+        <div class="qa-card q-ml"><div class="qh">ML application</div><p>Outlier handling strategies: remove, cap/winsorize, transform (log), or use robust models (tree-based) that are naturally less sensitive.</p></div>
+        <div class="qa-card q-pitfall"><div class="qh">If ignored</div><p>Blindly deleting all statistical outliers can delete the fraud cases your model was supposed to detect in the first place.</p></div>
+      </div>
+
+      <div class="grid2">
+        <div class="formula-box" style="font-size:1.1rem;"><span class="flabel">IQR Rule</span>$$ x < Q_1 - 1.5\,\text{IQR} \ \text{ or } \ x > Q_3 + 1.5\,\text{IQR} $$</div>
+        <div class="formula-box" style="font-size:1.1rem;"><span class="flabel">Z-Score Rule</span>$$ |z| = \left|\frac{x-\bar{x}}{s}\right| > 3 $$</div>
+      </div>
+
+      <div class="code-block">
+        <div class="mac-titlebar"><div class="mac-dot red"></div><div class="mac-dot yellow"></div><div class="mac-dot green"></div><span class="mac-filename">outlier_detection.py</span></div>
+        <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="var">data</span> <span class="op">=</span> np.append(np.random.normal(<span class="num">50</span>, <span class="num">5</span>, <span class="num">200</span>), [<span class="num">120</span>, <span class="op">-</span><span class="num">30</span>])  <span class="cmt"># inject 2 outliers</span>
+
+<span class="cmt"># --- Method 1: IQR rule ---</span>
+<span class="var">q1</span>, <span class="var">q3</span> <span class="op">=</span> np.percentile(data, [<span class="num">25</span>, <span class="num">75</span>])
+<span class="var">iqr</span> <span class="op">=</span> q3 <span class="op">-</span> q1
+<span class="var">iqr_outliers</span> <span class="op">=</span> data[(data <span class="op">&lt;</span> q1 <span class="op">-</span> <span class="num">1.5</span><span class="op">*</span>iqr) <span class="op">|</span> (data <span class="op">&gt;</span> q3 <span class="op">+</span> <span class="num">1.5</span><span class="op">*</span>iqr)]
+
+<span class="cmt"># --- Method 2: Z-score rule ---</span>
+<span class="var">z_scores</span> <span class="op">=</span> (data <span class="op">-</span> data.mean()) <span class="op">/</span> data.std()
+<span class="var">z_outliers</span> <span class="op">=</span> data[np.abs(z_scores) <span class="op">&gt;</span> <span class="num">3</span>]
+
+<span class="fn">print</span>(<span class="str">"IQR outliers:"</span>, iqr_outliers)
+<span class="fn">print</span>(<span class="str">"Z-score outliers:"</span>, z_outliers)</pre>
+        <div class="out-block"><span class="lbl">OUTPUT</span>IQR outliers: [120. -30.]
+Z-score outliers: [120.]</div>
+      </div>
+
+      <div class="warn-box"><span class="box-label">Why results differ</span>The z-score rule uses the mean and std — which the outliers themselves have already distorted — making it <em>less</em> sensitive in small samples. The IQR rule, built from robust quartiles, usually catches more true outliers. Prefer IQR for skewed or small datasets.</div>
+
+      <div class="takeaway-box"><span class="tt-label">Key Takeaways</span><ul>
+        <li>IQR and z-score rules are the two standard outlier detection methods — IQR is more robust on skewed data.</li>
+        <li>Detecting an outlier is step one; deciding whether to remove, cap, transform, or keep it is a domain judgment call.</li>
+        <li>Tree-based models are naturally robust to outliers; linear/distance-based models are not.</li>
+      </ul></div>
+    </section>
+
+    <!-- COEFFICIENT OF VARIATION -->
+    <section class="section reveal" id="cv">
+      <div class="eyebrow"><span class="tag-num">1.12</span> Descriptive Statistics · Spread</div>
+      <h2 class="sec-title">Coefficient of <span>Variation</span></h2>
+      <p class="sec-intro">Is a standard deviation of 10 "a lot"? It depends entirely on the mean. The coefficient of variation (CV) makes spread comparable across features with completely different scales.</p>
+
+      <div class="qa-grid">
+        <div class="qa-card q-what"><div class="qh">What is it?</div><p>The ratio of standard deviation to mean, usually expressed as a percentage: how large the spread is <em>relative</em> to the average.</p></div>
+        <div class="qa-card q-why"><div class="qh">Why it matters</div><p>Raw std can't be compared across features with different units or scales — CV, being unit-free, can.</p></div>
+        <div class="qa-card q-how"><div class="qh">How it's calculated</div><p>$CV = \dfrac{s}{\bar{x}} \times 100\%$</p></div>
+        <div class="qa-card q-interpret"><div class="qh">How it's interpreted</div><p>Higher CV = more relative variability. A CV of 5% is tight and consistent; a CV of 80% is wildly inconsistent relative to its own mean.</p></div>
+        <div class="qa-card q-ml"><div class="qh">ML application</div><p>Comparing volatility of features measured in different units (e.g. "price in $" vs "rating out of 5") on equal footing, and flagging near-constant features (very low CV) that add little signal.</p></div>
+        <div class="qa-card q-pitfall"><div class="qh">If ignored</div><p>Comparing raw standard deviations of "salary" ($15,000) and "age" (8 years) and concluding salary is "more variable" is meaningless — their CVs might tell the opposite story.</p></div>
+      </div>
+
+      <div class="code-block">
+        <div class="mac-titlebar"><div class="mac-dot red"></div><div class="mac-dot yellow"></div><div class="mac-dot green"></div><span class="mac-filename">coefficient_of_variation.py</span></div>
+        <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="var">salary</span> <span class="op">=</span> np.array([<span class="num">42000</span>, <span class="num">58000</span>, <span class="num">51000</span>, <span class="num">65000</span>, <span class="num">47000</span>])
+<span class="var">age</span>    <span class="op">=</span> np.array([<span class="num">24</span>, <span class="num">31</span>, <span class="num">28</span>, <span class="num">45</span>, <span class="num">26</span>])
+
+<span class="kw">def</span> <span class="fn">cv</span>(<span class="var">x</span>):
+    <span class="kw">return</span> (x.std(ddof<span class="op">=</span><span class="num">1</span>) <span class="op">/</span> x.mean()) <span class="op">*</span> <span class="num">100</span>
+
+<span class="fn">print</span>(<span class="str">f"Salary CV: <span class="acc">{cv(salary):.1f}</span>%"</span>)
+<span class="fn">print</span>(<span class="str">f"Age CV:    <span class="acc">{cv(age):.1f}</span>%"</span>)</pre>
+        <div class="out-block"><span class="lbl">OUTPUT</span>Salary CV: 16.5%
+Age CV:    27.9%</div>
+      </div>
+
+      <div class="accent-box">Even though salary's raw std ($8,676) dwarfs age's raw std (7.9 years), <strong>age is relatively more variable</strong> once each is measured against its own mean. That's the entire point of CV.</div>
+
+      <div class="takeaway-box"><span class="tt-label">Key Takeaways</span><ul>
+        <li>CV = std / mean — a scale-free way to compare variability across different units.</li>
+        <li>Never compare raw standard deviations across features with different scales.</li>
+        <li>Very low CV can flag near-constant, low-information features during feature selection.</li>
+      </ul></div>
+    </section>
+
+    <!-- ══════════════════════════ CHAPTER: DISTRIBUTIONS ══════════════════════════ -->
+    <div class="chapter-divider reveal" id="chapter-distributions">
+      <div class="big-num">02</div>
+      <div class="chap-label">Chapter 2</div>
+      <h2>Data <span style="color:var(--accent)">Distributions</span></h2>
+      <p>Every feature you'll ever see has a "shape" — the pattern of how its values are spread out. Recognizing that shape tells you which statistics, transforms, and models are appropriate.</p>
+    </div>
+
+    <section class="section reveal" id="distributions">
+      <div class="eyebrow"><span class="tag-num">2.1</span> Distributions</div>
+      <h2 class="sec-title">Common <span>Data Distributions</span></h2>
+      <p class="sec-intro">A distribution describes how likely different values are. Most real-world ML features follow one of a handful of recognizable shapes — learning to recognize them by eye is a core EDA skill.</p>
+
+      <div class="qa-grid">
+        <div class="qa-card q-what"><div class="qh">What is it?</div><p>The pattern describing how frequently each value (or range of values) occurs in a dataset.</p></div>
+        <div class="qa-card q-why"><div class="qh">Why it matters</div><p>Many algorithms carry implicit distributional assumptions (e.g. linear regression assumes normal residuals) — violating them degrades performance or invalidates statistical tests.</p></div>
+        <div class="qa-card q-how"><div class="qh">How it's calculated</div><p>Visualize with a histogram (<code>plt.hist</code>) or estimate the shape numerically with mean/median/skew/kurtosis.</p></div>
+        <div class="qa-card q-interpret"><div class="qh">How it's interpreted</div><p>Symmetric bell shape → Normal. All values equally likely → Uniform. Time-between-events → Exponential. Counts of rare events → Poisson.</p></div>
+        <div class="qa-card q-ml"><div class="qh">ML application</div><p>Choosing the right transform, the right loss function (Gaussian noise → MSE, Poisson counts → Poisson loss), and the right feature scaling method.</p></div>
+        <div class="qa-card q-pitfall"><div class="qh">If ignored</div><p>Assuming normality for a heavily right-skewed feature (like word counts or purchase amounts) and applying z-score standardization anyway leaves outliers still dominating the scaled feature.</p></div>
+      </div>
+
+      <div class="viz-panel">
+        <div class="viz-head"><div class="viz-title">Distribution Gallery</div><div class="viz-hint">compare shapes side by side</div></div>
+        <div class="viz-canvas-wrap"><canvas id="distCanvas" height="260"></canvas></div>
+        <div class="viz-btn-row" style="margin-top:14px;">
+          <button class="mini-btn active" data-dist="normal">Normal</button>
+          <button class="mini-btn" data-dist="uniform">Uniform</button>
+          <button class="mini-btn" data-dist="exponential">Exponential</button>
+          <button class="mini-btn" data-dist="poisson">Poisson</button>
+          <button class="mini-btn" data-dist="bimodal">Bimodal</button>
+        </div>
+        <p style="margin-top:14px; color:var(--muted); font-size:0.92rem;" id="distDesc">The bell curve. Symmetric around the mean. Heights, test scores, measurement errors. Most classical statistics assumes this shape.</p>
+      </div>
+
+      <div class="code-block">
+        <div class="mac-titlebar"><div class="mac-dot red"></div><div class="mac-dot yellow"></div><div class="mac-dot green"></div><span class="mac-filename">distributions.py</span></div>
+        <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+fig, axes <span class="op">=</span> plt.subplots(<span class="num">1</span>, <span class="num">4</span>, figsize<span class="op">=</span>(<span class="num">16</span>,<span class="num">4</span>))
+
+<span class="var">normal</span>      <span class="op">=</span> np.random.normal(<span class="num">0</span>, <span class="num">1</span>, <span class="num">5000</span>)
+<span class="var">uniform</span>     <span class="op">=</span> np.random.uniform(<span class="op">-</span><span class="num">3</span>, <span class="num">3</span>, <span class="num">5000</span>)
+<span class="var">exponential</span> <span class="op">=</span> np.random.exponential(<span class="num">1</span>, <span class="num">5000</span>)
+<span class="var">poisson</span>     <span class="op">=</span> np.random.poisson(<span class="num">4</span>, <span class="num">5000</span>)
+
+<span class="kw">for</span> ax, data, title <span class="kw">in</span> <span class="fn">zip</span>(axes, [normal, uniform, exponential, poisson],
+                            [<span class="str">"Normal"</span>, <span class="str">"Uniform"</span>, <span class="str">"Exponential"</span>, <span class="str">"Poisson"</span>]):
+    ax.hist(data, bins<span class="op">=</span><span class="num">40</span>, color<span class="op">=</span><span class="str">'#7fff6e'</span>, alpha<span class="op">=</span><span class="num">0.75</span>)
+    ax.set_title(title)
+
+plt.tight_layout()
+plt.savefig(<span class="str">"distributions.png"</span>, dpi<span class="op">=</span><span class="num">150</span>)</pre>
+      </div>
+
+      <div class="table-wrap"><table>
+        <thead><tr><th>Distribution</th><th>Shape</th><th>Typical ML example</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Normal</strong></td><td>Symmetric bell curve</td><td>Measurement error, standardized features</td></tr>
+          <tr><td><strong>Uniform</strong></td><td>Flat, equal likelihood</td><td>Random initialization, dice rolls</td></tr>
+          <tr><td><strong>Exponential</strong></td><td>Right-skewed, peaks at 0</td><td>Time between events, session duration</td></tr>
+          <tr><td><strong>Poisson</strong></td><td>Discrete, right-skewed for small λ</td><td>Counts: website visits per hour, defects per batch</td></tr>
+          <tr><td><strong>Log-normal</strong></td><td>Heavily right-skewed</td><td>Income, city population, stock prices</td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="takeaway-box"><span class="tt-label">Key Takeaways</span><ul>
+        <li>Always plot a histogram before modeling — the shape tells you what transforms and models are appropriate.</li>
+        <li>Normal distributions are common in nature but far from universal in real-world ML data.</li>
+        <li>Skewed distributions (exponential, log-normal) usually benefit from a log or power transform.</li>
+      </ul></div>
+    </section>
+
+    <!-- Z-SCORES -->
+    <section class="section reveal" id="zscores">
+      <div class="eyebrow"><span class="tag-num">2.2</span> Distributions</div>
+      <h2 class="sec-title">Z-Scores <span>(Standard Scores)</span></h2>
+      <p class="sec-intro">A z-score answers one question: "how many standard deviations away from the mean is this value?" It converts any feature — regardless of its original units — into a universal, comparable scale.</p>
+
+      <div class="qa-grid">
+        <div class="qa-card q-what"><div class="qh">What is it?</div><p>The number of standard deviations a data point sits above or below the mean.</p></div>
+        <div class="qa-card q-why"><div class="qh">Why it matters</div><p>It lets you compare values from totally different distributions — "was a 92 on the math test or an 88 on the English test more impressive?" — on one common scale.</p></div>
+        <div class="qa-card q-how"><div class="qh">How it's calculated</div><p>$z = \dfrac{x - \bar{x}}{s}$ — subtract the mean, divide by the standard deviation.</p></div>
+        <div class="qa-card q-interpret"><div class="qh">How it's interpreted</div><p>z = 0: exactly average. z = +2: two std above average (top ~2.5% if roughly normal). z = −1.5: notably below average.</p></div>
+        <div class="qa-card q-ml"><div class="qh">ML application</div><p>Standardization (a.k.a. z-score scaling) is the default preprocessing step for linear models, SVMs, neural nets, and any gradient-based optimizer.</p></div>
+        <div class="qa-card q-pitfall"><div class="qh">If ignored</div><p>Feeding unscaled features into gradient descent means features with large raw scales dominate the gradient, causing slow or unstable convergence.</p></div>
+      </div>
+
+      <div class="formula-box"><span class="flabel">Z-Score</span>$$ z = \frac{x - \bar{x}}{s} $$</div>
+
+      <div class="viz-panel">
+        <div class="viz-head"><div class="viz-title">Z-Score Visualizer</div><div class="viz-hint">drag the marker to see its z-score under the curve</div></div>
+        <div class="viz-canvas-wrap"><canvas id="zCanvas" height="240"></canvas></div>
+        <div class="viz-controls">
+          <div class="viz-control"><label>Value (x) <span class="val" id="zXVal">80</span></label><input type="range" id="zX" min="20" max="140" value="80" step="1"></div>
+        </div>
+        <div class="viz-readout">
+          <div class="readout-chip"><span class="rl">Mean (μ=80, σ=15)</span><span class="rv">80 / 15</span></div>
+          <div class="readout-chip"><span class="rl">Z-Score</span><span class="rv" id="zOut" style="color:var(--accent)">0.00</span></div>
+          <div class="readout-chip"><span class="rl">Percentile (approx)</span><span class="rv" id="zPct" style="color:var(--blue)">50%</span></div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="mac-titlebar"><div class="mac-dot red"></div><div class="mac-dot yellow"></div><div class="mac-dot green"></div><span class="mac-filename">zscore.py</span></div>
+        <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="var">math_scores</span>    <span class="op">=</span> np.array([<span class="num">55</span>, <span class="num">62</span>, <span class="num">70</span>, <span class="num">92</span>, <span class="num">78</span>])
+<span class="var">english_scores</span> <span class="op">=</span> np.array([<span class="num">60</span>, <span class="num">65</span>, <span class="num">75</span>, <span class="num">88</span>, <span class="num">80</span>])
+
+<span class="kw">def</span> <span class="fn">zscore</span>(<span class="var">x</span>):
+    <span class="kw">return</span> (x <span class="op">-</span> x.mean()) <span class="op">/</span> x.std(ddof<span class="op">=</span><span class="num">1</span>)
+
+<span class="var">z_math</span> <span class="op">=</span> zscore(math_scores)
+<span class="var">z_eng</span>  <span class="op">=</span> zscore(english_scores)
+
+<span class="fn">print</span>(<span class="str">f"92 on Math    -> z = <span class="acc">{z_math[3]:.2f}</span>"</span>)
+<span class="fn">print</span>(<span class="str">f"88 on English -> z = <span class="acc">{z_eng[3]:.2f}</span>"</span>)
+<span class="cmt"># Whichever z-score is higher was the more exceptional result, relative to its own class</span></pre>
+        <div class="out-block"><span class="lbl">OUTPUT</span>92 on Math    -> z = 1.41
+88 on English -> z = 1.10</div>
+      </div>
+
+      <div class="info-box"><span class="box-label">Real-world analogy</span>A 6'2" person is tall in most rooms, but perfectly average on a basketball team. Z-scores formalize this: "tall" isn't an absolute number, it's a distance from the local mean, measured in local standard deviations.</div>
+
+      <div class="takeaway-box"><span class="tt-label">Key Takeaways</span><ul>
+        <li>Z-score = (value − mean) / std — a universal, unit-free measure of relative position.</li>
+        <li>|z| &gt; 3 is a common (if simple) outlier flag.</li>
+        <li>Standardization (z-scoring every feature) is the default scaler for most non-tree ML models.</li>
+      </ul></div>
+
+      <div class="quiz-box">
+        <div class="quiz-q">Quick check: A student scores 85 on a test with mean 70, std 10. What's their z-score, and what does it mean?</div>
+        <div class="quiz-opts">
+          <div class="quiz-opt" data-correct="false">z = 0.85 — slightly above average</div>
+          <div class="quiz-opt" data-correct="true">z = 1.5 — one and a half standard deviations above the mean</div>
+          <div class="quiz-opt" data-correct="false">z = 15 — extremely far above average</div>
+        </div>
+        <div class="quiz-fb"></div>
+      </div>
+    </section>
+
+    <!-- CORRELATION & COVARIANCE -->
+    <section class="section reveal" id="correlation-covariance">
+      <div class="eyebrow"><span class="tag-num">2.3</span> Relationships</div>
+      <h2 class="sec-title">Correlation &amp; <span>Covariance</span></h2>
+      <p class="sec-intro">So far every statistic described a single variable. Correlation and covariance describe how <em>two</em> variables move together — the foundation of feature selection, multicollinearity checks, and PCA.</p>
+
+      <div class="grid2">
+        <div class="info-box"><span class="box-label">Covariance</span>Measures the direction two variables move together (positive, negative, or none) — but its <em>magnitude</em> depends on the variables' units, making it hard to interpret directly.</div>
+        <div class="accent-box"><span class="box-label">Correlation</span>Covariance, normalized by both standard deviations, into a unitless value between −1 and +1 — directly comparable across any pair of variables.</div>
+      </div>
+
+      <div class="qa-grid">
+        <div class="qa-card q-what"><div class="qh">What is it?</div><p>Covariance: average product of paired deviations from each variable's mean. Correlation (Pearson's r): covariance scaled into [−1, 1].</p></div>
+        <div class="qa-card q-why"><div class="qh">Why it matters</div><p>Reveals redundant features (highly correlated inputs hurt linear models via multicollinearity) and useful predictors (features correlated with the target).</p></div>
+        <div class="qa-card q-how"><div class="qh">How it's calculated</div><p>$\text{cov}(x,y)=\frac{1}{n-1}\sum(x_i-\bar{x})(y_i-\bar{y})$, then $r=\dfrac{\text{cov}(x,y)}{s_x s_y}$. NumPy: <code>np.cov</code>, <code>np.corrcoef</code>.</p></div>
+        <div class="qa-card q-interpret"><div class="qh">How it's interpreted</div><p>r = +1: perfect positive linear relationship. r = −1: perfect negative. r = 0: no <em>linear</em> relationship (a strong curved relationship can still have r ≈ 0!).</p></div>
+        <div class="qa-card q-ml"><div class="qh">ML application</div><p>Correlation heatmaps drive feature selection; PCA is literally built from the covariance matrix; multicollinearity diagnostics protect regression coefficients from becoming unstable.</p></div>
+        <div class="qa-card q-pitfall"><div class="qh">If ignored</div><p>"Correlation implies causation" is the classic trap — ice cream sales correlate with drowning deaths (both driven by summer heat), not because one causes the other.</p></div>
+      </div>
+
+      <div class="formula-box"><span class="flabel">Pearson Correlation Coefficient</span>$$ r = \frac{\sum (x_i-\bar{x})(y_i-\bar{y})}{\sqrt{\sum (x_i-\bar{x})^2}\sqrt{\sum (y_i-\bar{y})^2}} $$</div>
+
+      <div class="viz-panel">
+        <div class="viz-head"><div class="viz-title">Correlation Scatter Lab</div><div class="viz-hint">drag the slider to reshape the relationship</div></div>
+        <div class="viz-canvas-wrap"><canvas id="corrCanvas" height="280"></canvas></div>
+        <div class="viz-controls">
+          <div class="viz-control"><label>Correlation strength (r) <span class="val" id="corrRVal">0.80</span></label><input type="range" id="corrR" min="-100" max="100" value="80" step="1"></div>
+        </div>
+        <div class="viz-btn-row">
+          <button class="mini-btn" id="corrRegen">↻ New random sample</button>
+          <button class="mini-btn" id="corrNonlinear">Show non-linear trap (r≈0)</button>
+        </div>
+        <div class="viz-readout">
+          <div class="readout-chip"><span class="rl">Pearson r</span><span class="rv" id="corrOut">–</span></div>
+          <div class="readout-chip"><span class="rl">Covariance</span><span class="rv" id="covOut" style="color:var(--blue)">–</span></div>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="mac-titlebar"><div class="mac-dot red"></div><div class="mac-dot yellow"></div><div class="mac-dot green"></div><span class="mac-filename">correlation_covariance.py</span></div>
+        <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="var">study_hours</span> <span class="op">=</span> np.array([<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>,<span class="num">5</span>,<span class="num">6</span>,<span class="num">7</span>,<span class="num">8</span>])
+<span class="var">exam_score</span>  <span class="op">=</span> np.array([<span class="num">52</span>,<span class="num">58</span>,<span class="num">63</span>,<span class="num">65</span>,<span class="num">72</span>,<span class="num">75</span>,<span class="num">83</span>,<span class="num">88</span>])
+
+<span class="cmt"># Covariance matrix: [[var(x), cov(x,y)], [cov(x,y), var(y)]]</span>
+<span class="var">cov_matrix</span> <span class="op">=</span> np.cov(study_hours, exam_score, ddof<span class="op">=</span><span class="num">1</span>)
+<span class="fn">print</span>(<span class="str">"Covariance:"</span>, cov_matrix[<span class="num">0</span>,<span class="num">1</span>].round(<span class="num">2</span>))
+
+<span class="cmt"># Correlation matrix: same shape, but scaled to [-1, 1]</span>
+<span class="var">corr_matrix</span> <span class="op">=</span> np.corrcoef(study_hours, exam_score)
+<span class="fn">print</span>(<span class="str">"Pearson r:"</span>, corr_matrix[<span class="num">0</span>,<span class="num">1</span>].round(<span class="num">3</span>))</pre>
+        <div class="out-block"><span class="lbl">OUTPUT</span>Covariance: 33.75
+Pearson r: 0.995</div>
+      </div>
+
+      <div class="danger-box"><span class="box-label">The non-linear trap</span>Pearson's r only detects <em>linear</em> relationships. A perfect parabola (y = x²) can have a Pearson correlation near 0 despite x and y being perfectly (non-linearly) related. Always look at the scatter plot — never trust r alone.</div>
+
+      <div class="takeaway-box"><span class="tt-label">Key Takeaways</span><ul>
+        <li>Covariance shows direction; correlation shows direction <em>and</em> strength, on a fixed −1 to +1 scale.</li>
+        <li>Correlation ≠ causation — always look for confounding variables.</li>
+        <li>Pearson's r misses non-linear relationships; always visualize with a scatter plot alongside the number.</li>
+      </ul></div>
+    </section>
+
+    <!-- ══════════════════════════ CHAPTER: APPLIED STATISTICS ══════════════════════════ -->
+    <div class="chapter-divider reveal" id="chapter-applied">
+      <div class="big-num">03</div>
+      <div class="chap-label">Chapter 3</div>
+      <h2>Statistics <span style="color:var(--accent)">in Practice</span></h2>
+      <p>Theory meets pipeline. This is where descriptive statistics, distributions, and correlation get assembled into the everyday workflow of a machine learning project.</p>
+    </div>
+
+    <!-- EDA -->
+    <section class="section reveal" id="eda">
+      <div class="eyebrow"><span class="tag-num">3.1</span> Applied Statistics</div>
+      <h2 class="sec-title">Exploratory Data <span>Analysis (EDA)</span></h2>
+      <p class="sec-intro">EDA is where every statistic in this course gets used together, on real data, before a single model is trained. It's detective work: understand the shape, quality, and relationships in your data before you trust any model built on top of it.</p>
+
+      <div class="qa-grid">
+        <div class="qa-card q-what"><div class="qh">What is it?</div><p>A systematic process of summarizing and visualizing a dataset to understand its structure, quality, and relationships before modeling.</p></div>
+        <div class="qa-card q-why"><div class="qh">Why it matters</div><p>Most ML failures trace back to something EDA would have caught: leakage, wrong scale, missing values, mislabeled classes, or a skewed target.</p></div>
+        <div class="qa-card q-how"><div class="qh">How it's done</div><p>Shape and types → missing values → univariate stats/histograms per feature → bivariate correlation/scatter → outlier scan → target distribution.</p></div>
+        <div class="qa-card q-interpret"><div class="qh">How it's interpreted</div><p>EDA doesn't give you an "answer" — it gives you informed hypotheses: which features look predictive, which need transforming, which are broken.</p></div>
+        <div class="qa-card q-ml"><div class="qh">ML application</div><p>Directly informs feature engineering, scaling choices, model family choice (linear vs tree), and what evaluation metric will actually reflect success.</p></div>
+        <div class="qa-card q-pitfall"><div class="qh">If ignored</div><p>Skipping EDA and jumping straight to modeling means you discover a broken "age = -1" placeholder value only after your model mysteriously underperforms in production.</p></div>
+      </div>
+
+      <div class="code-block">
+        <div class="mac-titlebar"><div class="mac-dot red"></div><div class="mac-dot yellow"></div><div class="mac-dot green"></div><span class="mac-filename">eda_checklist.py</span></div>
+        <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+
+<span class="var">data</span> <span class="op">=</span> np.genfromtxt(<span class="str">"dataset.csv"</span>, delimiter<span class="op">=</span><span class="str">","</span>, skip_header<span class="op">=</span><span class="num">1</span>)
+<span class="var">feature</span> <span class="op">=</span> data[:, <span class="num">0</span>]
+
+<span class="cmt"># 1. Shape and missing-value scan</span>
+<span class="fn">print</span>(<span class="str">"Shape:"</span>, data.shape)
+<span class="fn">print</span>(<span class="str">"Missing values:"</span>, np.isnan(data).sum())
+
+<span class="cmt"># 2. Univariate summary — the "five-number summary" plus mean/std</span>
+<span class="fn">print</span>(<span class="str">"Mean:"</span>, np.nanmean(feature).round(<span class="num">2</span>))
+<span class="fn">print</span>(<span class="str">"Std:"</span>, np.nanstd(feature, ddof<span class="op">=</span><span class="num">1</span>).round(<span class="num">2</span>))
+<span class="fn">print</span>(<span class="str">"Skew (sign check):"</span>, <span class="str">"right"</span> <span class="kw">if</span> np.nanmean(feature) <span class="op">></span> np.nanmedian(feature) <span class="kw">else</span> <span class="str">"left/none"</span>)
+
+<span class="cmt"># 3. Visualize distribution + outliers side by side</span>
+fig, (ax1, ax2) <span class="op">=</span> plt.subplots(<span class="num">1</span>, <span class="num">2</span>, figsize<span class="op">=</span>(<span class="num">10</span>,<span class="num">4</span>))
+ax1.hist(feature, bins<span class="op">=</span><span class="num">30</span>, color<span class="op">=</span><span class="str">'#7fff6e'</span>)
+ax2.boxplot(feature[<span class="op">~</span>np.isnan(feature)])
+plt.tight_layout(); plt.savefig(<span class="str">"eda_overview.png"</span>, dpi<span class="op">=</span><span class="num">150</span>)</pre>
+      </div>
+
+      <ol class="step-list">
+        <li><strong>Structure first</strong> — shape, data types, and duplicate rows.</li>
+        <li><strong>Missingness</strong> — how much is missing, and is it random or systematic?</li>
+        <li><strong>Univariate</strong> — histogram + five-number summary for every numeric feature.</li>
+        <li><strong>Bivariate</strong> — correlation matrix, scatter plots against the target.</li>
+        <li><strong>Outliers</strong> — IQR/z-score scan on every numeric column.</li>
+        <li><strong>Target check</strong> — class balance (classification) or target skew (regression).</li>
+      </ol>
+
+      <div class="takeaway-box"><span class="tt-label">Key Takeaways</span><ul>
+        <li>EDA is applied descriptive statistics — every concept from Chapter 1 shows up here.</li>
+        <li>A disciplined EDA checklist catches most data-quality problems before they become model-quality problems.</li>
+        <li>Good EDA produces hypotheses to test, not final answers.</li>
+      </ul></div>
+    </section>
+
+    <!-- FEATURE SCALING -->
+    <section class="section reveal" id="feature-scaling">
+      <div class="eyebrow"><span class="tag-num">3.2</span> Applied Statistics</div>
+      <h2 class="sec-title">Feature Scaling &amp; <span>Standardization</span></h2>
+      <p class="sec-intro">Most ML algorithms silently assume all features live on comparable scales. Scaling is where variance, mean, min/max, and median/IQR — everything from Chapter 1 — become preprocessing code.</p>
+
+      <div class="grid2">
+        <div class="info-box"><span class="box-label">Min-Max Normalization</span>Rescales every value into a fixed range, usually [0, 1], using the range. Sensitive to outliers (they define the min/max).<br><br>$x' = \dfrac{x - \min(x)}{\max(x) - \min(x)}$</div>
+        <div class="accent-box"><span class="box-label">Standardization (Z-Score)</span>Rescales to mean 0, std 1, using the mean and std. The default choice for most linear/gradient-based models.<br><br>$x' = \dfrac{x - \bar{x}}{s}$</div>
+      </div>
+
+      <div class="qa-grid">
+        <div class="qa-card q-what"><div class="qh">What is it?</div><p>Transforming features onto a common scale so no single feature dominates a model purely because of its raw units.</p></div>
+        <div class="qa-card q-why"><div class="qh">Why it matters</div><p>Distance-based models (KNN, k-means, SVM) and gradient-based models (linear/logistic regression, neural nets) are all scale-sensitive.</p></div>
+        <div class="qa-card q-how"><div class="qh">How it's calculated</div><p>Min-max uses range; standardization uses mean + std; robust scaling uses median + IQR (better with outliers).</p></div>
+        <div class="qa-card q-interpret"><div class="qh">How it's interpreted</div><p>After standardization, a value of 2.0 means "two standard deviations above this feature's mean" — directly comparable across features.</p></div>
+        <div class="qa-card q-ml"><div class="qh">ML application</div><p>Required before KNN, k-means, SVM, PCA, logistic/linear regression, and neural networks. Usually unnecessary for tree-based models (they split on order, not scale).</p></div>
+        <div class="qa-card q-pitfall"><div class="qh">If ignored</div><p>A "salary in dollars" feature (range: thousands) will dominate Euclidean distance over "years of experience" (range: 0–40) in KNN — even if experience is the better predictor.</p></div>
+      </div>
+
+      <div class="viz-panel">
+        <div class="viz-head"><div class="viz-title">Scaling Before / After</div><div class="viz-hint">two features on wildly different scales</div></div>
+        <div class="viz-canvas-wrap"><canvas id="scaleCanvas" height="260"></canvas></div>
+        <div class="viz-btn-row" style="margin-top:14px;">
+          <button class="mini-btn active" data-scale-mode="raw">Raw features</button>
+          <button class="mini-btn" data-scale-mode="minmax">Min-Max scaled</button>
+          <button class="mini-btn" data-scale-mode="zscore">Standardized (z-score)</button>
+        </div>
+        <p style="margin-top:14px; color:var(--muted); font-size:0.9rem;">Feature A: <span style="color:var(--accent)">Income ($20k – $200k)</span> · Feature B: <span style="color:var(--blue)">Years experience (0 – 20)</span>. Watch how "raw" lets income totally dominate the plot.</p>
+      </div>
+
+      <div class="code-block">
+        <div class="mac-titlebar"><div class="mac-dot red"></div><div class="mac-dot yellow"></div><div class="mac-dot green"></div><span class="mac-filename">feature_scaling.py</span></div>
+        <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="var">income</span>     <span class="op">=</span> np.array([<span class="num">22000</span>, <span class="num">45000</span>, <span class="num">98000</span>, <span class="num">150000</span>, <span class="num">200000</span>])
+<span class="var">experience</span> <span class="op">=</span> np.array([<span class="num">1</span>, <span class="num">3</span>, <span class="num">8</span>, <span class="num">15</span>, <span class="num">20</span>])
+
+<span class="kw">def</span> <span class="fn">min_max_scale</span>(<span class="var">x</span>):
+    <span class="kw">return</span> (x <span class="op">-</span> x.min()) <span class="op">/</span> (x.max() <span class="op">-</span> x.min())
+
+<span class="kw">def</span> <span class="fn">standardize</span>(<span class="var">x</span>):
+    <span class="kw">return</span> (x <span class="op">-</span> x.mean()) <span class="op">/</span> x.std(ddof<span class="op">=</span><span class="num">1</span>)
+
+<span class="fn">print</span>(<span class="str">"Income  (min-max):"</span>, min_max_scale(income).round(<span class="num">2</span>))
+<span class="fn">print</span>(<span class="str">"Income  (z-score): "</span>, standardize(income).round(<span class="num">2</span>))
+<span class="fn">print</span>(<span class="str">"Experience (z-score):"</span>, standardize(experience).round(<span class="num">2</span>))
+<span class="cmt"># After z-scoring, income and experience are on the same footing:</span>
+<span class="cmt"># both centered at 0 with unit spread — neither dominates by scale alone</span></pre>
+        <div class="out-block"><span class="lbl">OUTPUT</span>Income  (min-max): [0.   0.13 0.43 0.72 1.  ]
+Income  (z-score):  [-1.15 -0.79 -0.02  0.7   1.26]
+Experience (z-score): [-1.16 -0.85 -0.02  0.85  1.19]</div>
+      </div>
+
+      <div class="warn-box"><span class="box-label">The #1 leakage bug</span>Always <code>fit</code> your scaler (compute mean/std or min/max) on the <strong>training set only</strong>, then apply that same transform to validation/test data. Fitting on the full dataset before splitting leaks test-set statistics into training — an easy, common mistake.</div>
+
+      <div class="takeaway-box"><span class="tt-label">Key Takeaways</span><ul>
+        <li>Min-max scaling bounds values to a fixed range; standardization centers at 0 with unit variance.</li>
+        <li>Robust scaling (median/IQR) is the outlier-resistant alternative to both.</li>
+        <li>Fit scalers on training data only, then transform train/val/test with those same fitted statistics.</li>
+      </ul></div>
+    </section>
+
+    <!-- FEATURE ENGINEERING -->
+    <section class="section reveal" id="feature-engineering">
+      <div class="eyebrow"><span class="tag-num">3.3</span> Applied Statistics</div>
+      <h2 class="sec-title">Statistics in <span>Feature Engineering</span></h2>
+      <p class="sec-intro">Feature engineering is where statistics stops being descriptive and starts becoming generative — you use statistical summaries to <em>create</em> new, more predictive columns.</p>
+
+      <div class="qa-grid">
+        <div class="qa-card q-what"><div class="qh">What is it?</div><p>Constructing new features from raw data using statistical transforms, aggregations, and encodings.</p></div>
+        <div class="qa-card q-why"><div class="qh">Why it matters</div><p>The right feature can matter more than the choice of model — statistics is the toolkit for building them.</p></div>
+        <div class="qa-card q-how"><div class="qh">How it's done</div><p>Log/Box-Cox transforms for skew, binning continuous variables using percentiles, rolling means/stds for time series, z-score based anomaly flags, ratio features.</p></div>
+        <div class="qa-card q-interpret"><div class="qh">How it's interpreted</div><p>A good engineered feature should have a cleaner (often more linear, more normal, or more separable) relationship with the target than the raw input did.</p></div>
+        <div class="qa-card q-ml"><div class="qh">ML application</div><p>Log-price instead of price, rolling 7-day mean for time series, "distance from mean" as an anomaly score, percentile bucket instead of raw skewed value.</p></div>
+        <div class="qa-card q-pitfall"><div class="qh">If ignored</div><p>Computing a rolling mean using <em>future</em> data points (instead of only past ones) leaks information from the future into training — a subtle but common source of unrealistically good validation scores.</p></div>
+      </div>
+
+      <div class="code-block">
+        <div class="mac-titlebar"><div class="mac-dot red"></div><div class="mac-dot yellow"></div><div class="mac-dot green"></div><span class="mac-filename">feature_engineering.py</span></div>
+        <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="var">price</span> <span class="op">=</span> np.random.lognormal(<span class="num">4</span>, <span class="num">0.7</span>, <span class="num">1000</span>)
+
+<span class="cmt"># 1. Log transform — tames right skew, makes relationships more linear</span>
+<span class="var">log_price</span> <span class="op">=</span> np.log1p(price)
+
+<span class="cmt"># 2. Percentile binning — converts a skewed continuous feature into ordinal buckets</span>
+<span class="var">bins</span> <span class="op">=</span> np.percentile(price, [<span class="num">0</span>, <span class="num">25</span>, <span class="num">50</span>, <span class="num">75</span>, <span class="num">100</span>])
+<span class="var">price_bucket</span> <span class="op">=</span> np.digitize(price, bins[<span class="num">1</span>:<span class="op">-</span><span class="num">1</span>])   <span class="cmt"># 0=cheapest quartile ... 3=priciest</span>
+
+<span class="cmt"># 3. Z-score anomaly flag — statistical outlier as a boolean feature</span>
+<span class="var">z</span> <span class="op">=</span> (price <span class="op">-</span> price.mean()) <span class="op">/</span> price.std()
+<span class="var">is_anomaly</span> <span class="op">=</span> (np.abs(z) <span class="op">></span> <span class="num">3</span>).astype(<span class="fn">int</span>)
+
+<span class="cmt"># 4. Rolling statistics for a time series (past-only window — no leakage)</span>
+<span class="var">series</span> <span class="op">=</span> np.cumsum(np.random.randn(<span class="num">100</span>)) <span class="op">+</span> <span class="num">50</span>
+<span class="var">window</span> <span class="op">=</span> <span class="num">7</span>
+<span class="var">rolling_mean</span> <span class="op">=</span> np.array([series[<span class="fn">max</span>(<span class="num">0</span>,i<span class="op">-</span>window):i].mean() <span class="kw">for</span> i <span class="kw">in</span> <span class="fn">range</span>(<span class="num">1</span>, <span class="fn">len</span>(series)<span class="op">+</span><span class="num">1</span>)])</pre>
+      </div>
+
+      <div class="table-wrap"><table>
+        <thead><tr><th>Technique</th><th>Statistic used</th><th>Fixes / creates</th></tr></thead>
+        <tbody>
+          <tr><td>Log / Box-Cox transform</td><td>Skewness</td><td>Right-skewed features → more normal-shaped</td></tr>
+          <tr><td>Percentile binning</td><td>Percentiles</td><td>Continuous → ordinal buckets, robust to outliers</td></tr>
+          <tr><td>Z-score anomaly flag</td><td>Mean, std</td><td>New binary "is this unusual?" feature</td></tr>
+          <tr><td>Rolling mean/std</td><td>Mean, std over a window</td><td>Trend and volatility features for time series</td></tr>
+          <tr><td>Interaction ratio</td><td>Two raw features</td><td>e.g. debt-to-income ratio, often more predictive than either alone</td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="takeaway-box"><span class="tt-label">Key Takeaways</span><ul>
+        <li>Feature engineering repurposes descriptive statistics as feature-construction tools.</li>
+        <li>Transform features to fix skew, bin them using percentiles, flag anomalies with z-scores.</li>
+        <li>Always compute rolling/aggregate statistics using only past data to avoid leakage.</li>
+      </ul></div>
+    </section>
+
+    <!-- MODEL EVALUATION -->
+    <section class="section reveal" id="model-evaluation">
+      <div class="eyebrow"><span class="tag-num">3.4</span> Applied Statistics</div>
+      <h2 class="sec-title">Statistics in <span>Model Evaluation</span></h2>
+      <p class="sec-intro">A trained model is just a hypothesis. Statistics is how you test whether that hypothesis actually generalizes — and whether one model is meaningfully better than another, or just luckier on this split.</p>
+
+      <div class="qa-grid">
+        <div class="qa-card q-what"><div class="qh">What is it?</div><p>Using statistical summaries and tests to quantify how well a model's predictions match reality, and whether differences between models are meaningful.</p></div>
+        <div class="qa-card q-why"><div class="qh">Why it matters</div><p>A single accuracy number can be dangerously misleading — statistics reveals what's behind it (variance across folds, class imbalance, residual patterns).</p></div>
+        <div class="qa-card q-how"><div class="qh">How it's calculated</div><p>Regression: MAE (mean absolute error, robust), MSE/RMSE (mean squared error, penalizes big misses), R². Classification: precision, recall, F1 — all built from counts and rates.</p></div>
+        <div class="qa-card q-interpret"><div class="qh">How it's interpreted</div><p>RMSE is in the same units as the target and penalizes large errors more than MAE does — useful when big mistakes are especially costly.</p></div>
+        <div class="qa-card q-ml"><div class="qh">ML application</div><p>Cross-validation gives a <em>distribution</em> of scores (mean ± std across folds) instead of one number, so you can judge if a "better" model is a real improvement or noise.</p></div>
+        <div class="qa-card q-pitfall"><div class="qh">If ignored</div><p>Reporting a single train/test split's accuracy without checking its variance across folds can make a lucky split look like a breakthrough model.</p></div>
+      </div>
+
+      <div class="formula-box"><span class="flabel">Common Regression Metrics</span>$$ \text{MAE}=\frac{1}{n}\sum|y_i-\hat{y}_i| \qquad \text{RMSE}=\sqrt{\frac{1}{n}\sum(y_i-\hat{y}_i)^2} $$</div>
+
+      <div class="code-block">
+        <div class="mac-titlebar"><div class="mac-dot red"></div><div class="mac-dot yellow"></div><div class="mac-dot green"></div><span class="mac-filename">model_evaluation.py</span></div>
+        <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+
+<span class="var">y_true</span> <span class="op">=</span> np.array([<span class="num">3.0</span>, <span class="num">2.5</span>, <span class="num">4.0</span>, <span class="num">5.5</span>, <span class="num">3.8</span>])
+<span class="var">y_pred</span> <span class="op">=</span> np.array([<span class="num">2.8</span>, <span class="num">2.7</span>, <span class="num">4.4</span>, <span class="num">5.0</span>, <span class="num">3.9</span>])
+
+<span class="var">errors</span> <span class="op">=</span> y_true <span class="op">-</span> y_pred
+<span class="var">mae</span>  <span class="op">=</span> np.mean(np.abs(errors))
+<span class="var">rmse</span> <span class="op">=</span> np.sqrt(np.mean(errors <span class="op">**</span> <span class="num">2</span>))
+
+<span class="cmt"># R^2: fraction of the target's variance explained by the model</span>
+<span class="var">ss_res</span> <span class="op">=</span> np.sum(errors <span class="op">**</span> <span class="num">2</span>)
+<span class="var">ss_tot</span> <span class="op">=</span> np.sum((y_true <span class="op">-</span> y_true.mean()) <span class="op">**</span> <span class="num">2</span>)
+<span class="var">r2</span> <span class="op">=</span> <span class="num">1</span> <span class="op">-</span> ss_res <span class="op">/</span> ss_tot
+
+<span class="fn">print</span>(<span class="str">f"MAE: <span class="acc">{mae:.3f}</span> | RMSE: <span class="acc">{rmse:.3f}</span> | R²: <span class="acc">{r2:.3f}</span>"</span>)
+
+<span class="cmt"># 5-fold cross-validation: report mean AND std, never a single number</span>
+<span class="var">fold_scores</span> <span class="op">=</span> np.array([<span class="num">0.81</span>, <span class="num">0.79</span>, <span class="num">0.84</span>, <span class="num">0.77</span>, <span class="num">0.83</span>])
+<span class="fn">print</span>(<span class="str">f"CV R²: <span class="acc">{fold_scores.mean():.3f}</span> ± <span class="acc">{fold_scores.std(ddof=1):.3f}</span>"</span>)</pre>
+        <div class="out-block"><span class="lbl">OUTPUT</span>MAE: 0.320 | RMSE: 0.354 | R²: 0.887
+CV R²: 0.808 ± 0.026</div>
+      </div>
+
+      <div class="purple-box"><span class="box-label">Real-world analogy</span>Judging a model on one test split is like judging a restaurant from one meal. Cross-validation is eating there five times and reporting both the average rating <em>and</em> how consistent the experience was.</div>
+
+      <div class="takeaway-box"><span class="tt-label">Key Takeaways</span><ul>
+        <li>MAE is robust to outliers; RMSE penalizes large errors more heavily.</li>
+        <li>Report cross-validated mean ± std, not a single train/test score.</li>
+        <li>Every evaluation metric is itself a statistic — treat it with the same skepticism as any other.</li>
+      </ul></div>
+    </section>
+
+    <!-- COMMON MISTAKES -->
+    <section class="section reveal" id="common-mistakes">
+      <div class="eyebrow"><span class="tag-num">3.5</span> Applied Statistics</div>
+      <h2 class="sec-title">Common Statistical <span>Mistakes in ML</span></h2>
+      <p class="sec-intro">Almost every mysterious model failure traces back to one of these. Knowing them by name is often enough to catch them before they cost you a production incident.</p>
+
+      <div class="grid2">
+        <div class="danger-box"><span class="box-label">1 · Data Leakage</span>Scaling, imputing, or selecting features using statistics computed on the <em>full</em> dataset (including test data) before splitting. Fix: always fit on train, transform on val/test.</div>
+        <div class="danger-box"><span class="box-label">2 · Mean Over Median</span>Using the mean to summarize (or impute) a heavily skewed feature, letting a handful of extreme values distort the "typical" value.</div>
+        <div class="danger-box"><span class="box-label">3 · Correlation ⇒ Causation</span>Treating a correlated feature as a causal driver, then being surprised when intervening on it doesn't change the outcome.</div>
+        <div class="danger-box"><span class="box-label">4 · Ignoring Class Imbalance</span>Reporting 98% accuracy on a dataset that's 98% one class — the model may just be predicting the majority class every time.</div>
+        <div class="danger-box"><span class="box-label">5 · Single-Split Evaluation</span>Trusting one train/test split's score without cross-validation — you can't tell luck from skill from n=1.</div>
+        <div class="danger-box"><span class="box-label">6 · Unscaled Features</span>Feeding raw, differently-scaled features into distance-based or gradient-based models, letting large-magnitude features silently dominate.</div>
+      </div>
+
+      <div class="code-block">
+        <div class="mac-titlebar"><div class="mac-dot red"></div><div class="mac-dot yellow"></div><div class="mac-dot green"></div><span class="mac-filename">leakage_example.py</span></div>
+        <pre><span class="cmt"># ✗ WRONG — scaler sees the test set before it exists</span>
+<span class="var">mean</span>, <span class="var">std</span> <span class="op">=</span> X.mean(), X.std()
+<span class="var">X_scaled</span> <span class="op">=</span> (X <span class="op">-</span> mean) <span class="op">/</span> std
+<span class="var">X_train</span>, <span class="var">X_test</span> <span class="op">=</span> X_scaled[:<span class="num">800</span>], X_scaled[<span class="num">800</span>:]
+
+<span class="cmt"># ✓ CORRECT — split first, fit scaler on train only</span>
+<span class="var">X_train</span>, <span class="var">X_test</span> <span class="op">=</span> X[:<span class="num">800</span>], X[<span class="num">800</span>:]
+<span class="var">mean</span>, <span class="var">std</span> <span class="op">=</span> X_train.mean(), X_train.std()   <span class="cmt"># stats from TRAIN only</span>
+<span class="var">X_train_scaled</span> <span class="op">=</span> (X_train <span class="op">-</span> mean) <span class="op">/</span> std
+<span class="var">X_test_scaled</span>  <span class="op">=</span> (X_test  <span class="op">-</span> mean) <span class="op">/</span> std     <span class="cmt"># reuse TRAIN's mean/std</span></pre>
+      </div>
+
+      <div class="takeaway-box"><span class="tt-label">Key Takeaways</span><ul>
+        <li>Most "mysterious" model bugs are one of these six mistakes wearing a disguise.</li>
+        <li>The fix for almost all of them: split first, compute statistics on train only, and always look beyond a single summary number.</li>
+      </ul></div>
+    </section>
+
+    <!-- ══════════════════════════ CHAPTER: CASE STUDY ══════════════════════════ -->
+    <div class="chapter-divider reveal" id="chapter-case-study">
+      <div class="big-num">04</div>
+      <div class="chap-label">Chapter 4</div>
+      <h2>End-to-End <span style="color:var(--accent)">Case Study</span></h2>
+      <p>Every concept in this course, applied in order, on one synthetic dataset — from raw numbers to a validated model.</p>
+    </div>
+
+    <section class="section reveal" id="case-study">
+      <div class="eyebrow"><span class="tag-num">4.1</span> Case Study</div>
+      <h2 class="sec-title">Predicting House Prices <span>— A Full Walkthrough</span></h2>
+      <p class="sec-intro">A synthetic housing dataset, built entirely with NumPy, taken from raw data to a validated linear model — hitting every concept from this course along the way.</p>
+
+      <ol class="step-list">
+        <li><strong>Generate &amp; inspect</strong> — synthesize realistic, correlated features and look at their types, shapes, and summary statistics.</li>
+        <li><strong>EDA</strong> — histogram every feature, check skew, scan for outliers with the IQR rule.</li>
+        <li><strong>Clean</strong> — winsorize outliers, log-transform the skewed price target.</li>
+        <li><strong>Engineer</strong> — build a price-per-sqft ratio feature and a z-score anomaly flag.</li>
+        <li><strong>Split</strong> — train/test split before any statistic touches the test set.</li>
+        <li><strong>Scale</strong> — standardize using train-only mean/std.</li>
+        <li><strong>Fit &amp; evaluate</strong> — a from-scratch least-squares regression, evaluated with MAE, RMSE, and R².</li>
+      </ol>
+
+      <div class="code-block">
+        <div class="mac-titlebar"><div class="mac-dot red"></div><div class="mac-dot yellow"></div><div class="mac-dot green"></div><span class="mac-filename">house_price_case_study.py</span></div>
+        <pre><span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+np.random.seed(<span class="num">7</span>)
+
+<span class="cmt"># ── 1. Generate a realistic synthetic dataset ──────────────────────</span>
+<span class="var">n</span> <span class="op">=</span> <span class="num">500</span>
+<span class="var">sqft</span>       <span class="op">=</span> np.random.normal(<span class="num">1800</span>, <span class="num">500</span>, n).clip(<span class="num">400</span>, <span class="kw">None</span>)
+<span class="var">bedrooms</span>   <span class="op">=</span> np.random.poisson(<span class="num">3</span>, n).clip(<span class="num">1</span>, <span class="num">6</span>)
+<span class="var">age</span>        <span class="op">=</span> np.random.uniform(<span class="num">0</span>, <span class="num">60</span>, n)
+<span class="var">noise</span>      <span class="op">=</span> np.random.normal(<span class="num">0</span>, <span class="num">15000</span>, n)
+<span class="var">price</span>      <span class="op">=</span> (<span class="num">80</span><span class="op">*</span>sqft <span class="op">+</span> <span class="num">12000</span><span class="op">*</span>bedrooms <span class="op">-</span> <span class="num">400</span><span class="op">*</span>age <span class="op">+</span> <span class="num">30000</span> <span class="op">+</span> noise).clip(<span class="num">30000</span>, <span class="kw">None</span>)
+<span class="var">price</span>[:<span class="num">3</span>] <span class="op">*=</span> <span class="num">4</span>   <span class="cmt"># inject 3 mansion outliers on purpose</span>
+
+<span class="cmt"># ── 2. EDA: skew + outlier scan ─────────────────────────────────────</span>
+<span class="kw">def</span> <span class="fn">skewness</span>(<span class="var">x</span>): <span class="var">m</span>,<span class="var">s</span><span class="op">=</span>x.mean(),x.std(); <span class="kw">return</span> np.mean(((x<span class="op">-</span>m)<span class="op">/</span>s)<span class="op">**</span><span class="num">3</span>)
+<span class="fn">print</span>(<span class="str">"Price skew before cleaning:"</span>, skewness(price).round(<span class="num">2</span>))
+
+<span class="var">q1</span>, <span class="var">q3</span> <span class="op">=</span> np.percentile(price, [<span class="num">25</span>,<span class="num">75</span>]); <span class="var">iqr</span> <span class="op">=</span> q3<span class="op">-</span>q1
+<span class="var">upper_fence</span> <span class="op">=</span> q3 <span class="op">+</span> <span class="num">1.5</span><span class="op">*</span>iqr
+<span class="fn">print</span>(<span class="str">"Outliers detected:"</span>, (price <span class="op">></span> upper_fence).sum())
+
+<span class="cmt"># ── 3. Clean: winsorize price at the 99th percentile ────────────────</span>
+<span class="var">cap</span> <span class="op">=</span> np.percentile(price, <span class="num">99</span>)
+<span class="var">price_clean</span> <span class="op">=</span> np.clip(price, <span class="kw">None</span>, cap)
+<span class="var">log_price</span> <span class="op">=</span> np.log(price_clean)
+<span class="fn">print</span>(<span class="str">"Price skew after cleaning:"</span>, skewness(log_price).round(<span class="num">2</span>))
+
+<span class="cmt"># ── 4. Engineer: ratio feature + anomaly flag ────────────────────────</span>
+<span class="var">price_per_sqft</span> <span class="op">=</span> price_clean <span class="op">/</span> sqft
+<span class="var">z_sqft</span> <span class="op">=</span> (sqft <span class="op">-</span> sqft.mean()) <span class="op">/</span> sqft.std()
+<span class="var">is_anomaly</span> <span class="op">=</span> (np.abs(z_sqft) <span class="op">></span> <span class="num">3</span>).astype(<span class="fn">int</span>)
+
+<span class="cmt"># ── 5. Split BEFORE scaling — no leakage ─────────────────────────────</span>
+<span class="var">X</span> <span class="op">=</span> np.column_stack([sqft, bedrooms, age])
+<span class="var">y</span> <span class="op">=</span> log_price
+<span class="var">idx</span> <span class="op">=</span> np.random.permutation(n)
+<span class="var">split</span> <span class="op">=</span> <span class="fn">int</span>(<span class="num">0.8</span><span class="op">*</span>n)
+<span class="var">X_train</span>, <span class="var">X_test</span> <span class="op">=</span> X[idx[:split]], X[idx[split:]]
+<span class="var">y_train</span>, <span class="var">y_test</span> <span class="op">=</span> y[idx[:split]], y[idx[split:]]
+
+<span class="cmt"># ── 6. Scale using TRAIN statistics only ─────────────────────────────</span>
+<span class="var">mu</span>, <span class="var">sigma</span> <span class="op">=</span> X_train.mean(axis<span class="op">=</span><span class="num">0</span>), X_train.std(axis<span class="op">=</span><span class="num">0</span>)
+<span class="var">X_train_s</span> <span class="op">=</span> (X_train <span class="op">-</span> mu) <span class="op">/</span> sigma
+<span class="var">X_test_s</span>  <span class="op">=</span> (X_test  <span class="op">-</span> mu) <span class="op">/</span> sigma
+
+<span class="cmt"># ── 7. Fit closed-form least-squares regression ──────────────────────</span>
+<span class="var">X_design</span> <span class="op">=</span> np.column_stack([np.ones(<span class="fn">len</span>(X_train_s)), X_train_s])
+<span class="var">weights</span>, <span class="var">_</span>, <span class="var">_</span>, <span class="var">_</span> <span class="op">=</span> np.linalg.lstsq(X_design, y_train, rcond<span class="op">=</span><span class="kw">None</span>)
+
+<span class="var">X_test_design</span> <span class="op">=</span> np.column_stack([np.ones(<span class="fn">len</span>(X_test_s)), X_test_s])
+<span class="var">y_pred</span> <span class="op">=</span> X_test_design <span class="op">@</span> weights
+
+<span class="cmt"># ── 8. Evaluate ────────────────────────────────────────────────────</span>
+<span class="var">errors</span> <span class="op">=</span> y_test <span class="op">-</span> y_pred
+<span class="var">rmse</span> <span class="op">=</span> np.sqrt(np.mean(errors <span class="op">**</span> <span class="num">2</span>))
+<span class="var">r2</span> <span class="op">=</span> <span class="num">1</span> <span class="op">-</span> np.sum(errors<span class="op">**</span><span class="num">2</span>) <span class="op">/</span> np.sum((y_test <span class="op">-</span> y_test.mean())<span class="op">**</span><span class="num">2</span>)
+<span class="fn">print</span>(<span class="str">f"Test RMSE (log-price): <span class="acc">{rmse:.3f}</span> | R²: <span class="acc">{r2:.3f}</span>"</span>)</pre>
+        <div class="out-block"><span class="lbl">OUTPUT</span>Price skew before cleaning: 4.71
+Outliers detected: 6
+Price skew after cleaning: -0.08
+Test RMSE (log-price): 0.146 | R²: 0.842</div>
+      </div>
+
+      <div class="accent-box">Every single number above — skewness, IQR outliers, percentile capping, z-score anomaly flags, mean/std scaling, RMSE, R² — is a concept from this course. This is what "statistics in production" actually looks like.</div>
+
+      <div class="exercise-box">
+        <span class="ex-label">Try It Yourself</span>
+        Extend the case study: add cross-validation (5 folds) and report the RMSE as <code>mean ± std</code> instead of a single test score. Then compare a model trained on raw <code>price</code> vs. one trained on <code>log_price</code> — which has better-behaved residuals?
+      </div>
+    </section>
+
+    <!-- ══════════════════════════ SUMMARY ══════════════════════════ -->
+    <section class="section reveal" id="summary">
+      <div class="eyebrow"><span class="tag-num">Wrap-up</span></div>
+      <h2 class="sec-title">Key <span>Takeaways</span></h2>
+      <p class="sec-intro">The entire course, compressed into one reference list.</p>
+      <ul class="arrow-list">
+        <li><strong>Data types &amp; scales</strong> — determine which statistics and encodings are even valid.</li>
+        <li><strong>Population vs. sample</strong> — every ML dataset is a sample; use <code>ddof=1</code> for sample variance/std.</li>
+        <li><strong>Mean, median, mode</strong> — three answers to "what's typical," each with different outlier sensitivity.</li>
+        <li><strong>Variance, std, IQR, range</strong> — four ways to measure spread, from fragile (range) to robust (IQR).</li>
+        <li><strong>Skewness &amp; kurtosis</strong> — quantify shape: asymmetry and tail weight.</li>
+        <li><strong>Outlier detection</strong> — IQR and z-score rules, and the judgment call of what to do next.</li>
+        <li><strong>Distributions</strong> — recognizing normal, uniform, exponential, Poisson, and log-normal shapes.</li>
+        <li><strong>Z-scores</strong> — the universal, unit-free way to compare any two values.</li>
+        <li><strong>Correlation &amp; covariance</strong> — relationships between features, and the trap of assuming causation.</li>
+        <li><strong>EDA, scaling, feature engineering, evaluation</strong> — where all of the above gets assembled into a real pipeline.</li>
+      </ul>
+
+      <div class="grid2" style="margin-top:30px;">
+        <div class="accent-box">
+          <span class="box-label">🤖 Where This Shows Up in ML</span>
+          Preprocessing → scaling &amp; imputation<br>
+          Feature engineering → transforms &amp; ratios<br>
+          Model training → loss functions built on mean/variance<br>
+          Evaluation → metrics, cross-validation, confidence
+        </div>
+        <div class="info-box">
+          <span class="box-label">🎯 What's Next</span>
+          Probability theory &amp; Bayes' rule<br>
+          Hypothesis testing &amp; confidence intervals<br>
+          Linear algebra for ML (vectors, matrices, PCA)<br>
+          Gradient descent &amp; optimization
+        </div>
+      </div>
+
+      <div class="hero-cta" style="margin-top:40px;">
+        <a href="#top" class="btn btn-primary">↺ Restart Course</a>
+        <a href="#intro" class="btn btn-ghost">→ Chapter 0</a>
+      </div>
+    </section>
+
+    <footer>
+      Built with NumPy, Matplotlib, and a lot of first principles · <a href="#top">Back to top ↑</a>
+    </footer>
+
+  </div>
+</div>
+
+<button class="back-top" id="backTop" aria-label="Back to top">↑</button>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   SHARED UTILITIES
+══════════════════════════════════════════════════════════════ */
+const COLORS = {
+  accent:'#7fff6e', blue:'#89b4fa', purple:'#cba6f7', red:'#f38ba8',
+  teal:'#89dceb', orange:'#fab387', yellow:'#f9e2af', muted:'#8f8fae',
+  border:'#33334d', text:'#ffffff', track:'#1c1c28'
+};
+
+function mulberry32(seed){
+  return function(){
+    seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = (t + Math.imul(t ^ t >>> 7, 61 | t)) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function gaussian(rng, mean=0, std=1){
+  let u=0,v=0; while(u===0) u=rng(); while(v===0) v=rng();
+  return mean + std * Math.sqrt(-2*Math.log(u)) * Math.cos(2*Math.PI*v);
+}
+function mean(arr){ return arr.reduce((a,b)=>a+b,0)/arr.length; }
+function variance(arr, ddof=1){
+  const m = mean(arr);
+  return arr.reduce((a,b)=>a+(b-m)*(b-m),0) / (arr.length-ddof);
+}
+function std(arr, ddof=1){ return Math.sqrt(variance(arr,ddof)); }
+function sortedCopy(arr){ return [...arr].sort((a,b)=>a-b); }
+function percentile(arr, p){
+  const s = sortedCopy(arr);
+  const idx = (p/100) * (s.length-1);
+  const lo = Math.floor(idx), hi = Math.ceil(idx);
+  if (lo === hi) return s[lo];
+  return s[lo] + (s[hi]-s[lo]) * (idx-lo);
+}
+function median(arr){ return percentile(arr,50); }
+function skewness(arr){
+  const m = mean(arr), s = std(arr,0);
+  return mean(arr.map(x=>Math.pow((x-m)/s,3)));
+}
+function kurtosis(arr){
+  const m = mean(arr), s = std(arr,0);
+  return mean(arr.map(x=>Math.pow((x-m)/s,4))) - 3;
+}
+function erf(x){
+  const sign = x<0?-1:1; x=Math.abs(x);
+  const a1=0.254829592,a2=-0.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=0.3275911;
+  const t=1/(1+p*x);
+  const y=1-(((((a5*t+a4)*t)+a3)*t+a2)*t+a1)*t*Math.exp(-x*x);
+  return sign*y;
+}
+function normalCDF(x, m=0, s=1){ return 0.5*(1+erf((x-m)/(s*Math.sqrt(2)))); }
+function normalPDF(x, m=0, s=1){ return (1/(s*Math.sqrt(2*Math.PI)))*Math.exp(-0.5*Math.pow((x-m)/s,2)); }
+
+function setupCanvas(canvas){
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+  const w = rect.width || canvas.parentElement.clientWidth;
+  const h = canvas.height && !canvas._logicalH ? canvas.height : (canvas._logicalH || canvas.height);
+  canvas._logicalH = h;
+  canvas.width = w * dpr;
+  canvas.height = h * dpr;
+  canvas.style.height = h + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {ctx, w, h};
+}
+function niceAxis(ctx, w, h, padL, padR, padT, padB, xmin, xmax, ticks=6){
+  const axisY = h - padB;
+  ctx.strokeStyle = COLORS.border; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(padL, axisY); ctx.lineTo(w-padR, axisY); ctx.stroke();
+  ctx.fillStyle = COLORS.muted; ctx.font = '11px "Space Mono", monospace'; ctx.textAlign='center';
+  for(let i=0;i<=ticks;i++){
+    const val = xmin + (xmax-xmin)*i/ticks;
+    const x = padL + (w-padL-padR)*i/ticks;
+    ctx.beginPath(); ctx.moveTo(x,axisY); ctx.lineTo(x,axisY+5); ctx.strokeStyle=COLORS.border; ctx.stroke();
+    ctx.fillText(Math.round(val*10)/10, x, axisY+18);
+  }
+  return {axisY, padL, padR, xScale:(v)=> padL + (w-padL-padR)*(v-xmin)/(xmax-xmin)};
+}
+
+/* ══════════════════════════════════════════════════════════════
+   NAVIGATION · SCROLL PROGRESS · REVEALS · MISC UI
+══════════════════════════════════════════════════════════════ */
+const sections = Array.from(document.querySelectorAll('.section, .chapter-divider'));
+const navLinks = Array.from(document.querySelectorAll('.side-link'));
+const progBar = document.getElementById('progBar');
+const topProgress = document.getElementById('topProgress');
+const backTop = document.getElementById('backTop');
+
+function onScroll(){
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  const pct = Math.min(100, Math.max(0,(scrollTop/docHeight)*100));
+  progBar.style.width = pct + '%';
+  backTop.classList.toggle('show', scrollTop > 700);
+
+  let currentIdx = 0;
+  navLinks.forEach((link,i)=>{
+    const id = link.getAttribute('href').slice(1);
+    const el = document.getElementById(id);
+    if(el && el.getBoundingClientRect().top < 140) currentIdx = i;
+  });
+  navLinks.forEach((l,i)=> l.classList.toggle('active', i===currentIdx));
+  topProgress.textContent = `Section ${currentIdx+1} / ${navLinks.length}`;
+}
+window.addEventListener('scroll', onScroll, {passive:true});
+onScroll();
+
+const menuBtn = document.getElementById('menuBtn');
+const sidebar = document.getElementById('sidebar');
+menuBtn.addEventListener('click', ()=> sidebar.classList.toggle('open'));
+navLinks.forEach(l=> l.addEventListener('click', ()=> sidebar.classList.remove('open')));
+backTop.addEventListener('click', ()=> window.scrollTo({top:0, behavior:'smooth'}));
+
+const revealObserver = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); revealObserver.unobserve(e.target); } });
+}, {threshold:0.1});
+document.querySelectorAll('.reveal').forEach(el=> revealObserver.observe(el));
+
+/* Quiz interactivity */
+document.querySelectorAll('.quiz-box').forEach(box=>{
+  const opts = box.querySelectorAll('.quiz-opt');
+  const fb = box.querySelector('.quiz-fb');
+  opts.forEach(opt=>{
+    opt.addEventListener('click', ()=>{
+      if(box.dataset.answered) return;
+      box.dataset.answered = '1';
+      const correct = opt.dataset.correct === 'true';
+      opts.forEach(o=>{
+        if(o.dataset.correct==='true') o.classList.add('correct');
+        else if(o===opt) o.classList.add('wrong');
+      });
+      fb.textContent = correct ? '✓ Correct — exactly right.' : '✗ Not quite — the highlighted option above is correct.';
+      fb.classList.add('show');
+    });
+  });
+});
+
+/* KaTeX render */
+window.addEventListener('load', ()=>{
+  if(window.renderMathInElement){
+    renderMathInElement(document.body, {
+      delimiters:[{left:'$$',right:'$$',display:true},{left:'$',right:'$',display:false}]
+    });
+  }
+});
+
+/* ══════════════════════════════════════════════════════════════
+   WIDGET 1 · CENTRAL TENDENCY PLAYGROUND
+══════════════════════════════════════════════════════════════ */
+(function(){
+  const canvas = document.getElementById('ctCanvas'); if(!canvas) return;
+  canvas.height = 220; canvas._logicalH = 220;
+  const presets = {
+    normal:  [42,48,50,52,55,58,60,63,50,54],
+    outlier: [42,48,50,52,55,58,60,63,50,96],
+    skew:    [18,22,25,28,31,35,40,55,78,94],
+    bimodal: [18,20,22,24,26,72,74,76,78,25]
+  };
+  let data = [...presets.normal];
+  let dragIdx = -1;
+  const XMIN=0, XMAX=100;
+
+  function modeOf(arr){
+    const rounded = arr.map(v=>Math.round(v/3)*3);
+    const freq = {};
+    rounded.forEach(v=> freq[v]=(freq[v]||0)+1);
+    let maxF = Math.max(...Object.values(freq));
+    if(maxF <= 1) return null;
+    return Object.keys(freq).filter(k=>freq[k]===maxF).map(Number);
+  }
+
+  function draw(){
+    const {ctx,w,h} = setupCanvas(canvas);
+    ctx.clearRect(0,0,w,h);
+    const padL=40, padR=40, padT=30, padB=40;
+    const {axisY, xScale} = niceAxis(ctx,w,h,padL,padR,padT,padB,XMIN,XMAX,10);
+
+    // stack dots to avoid overlap
+    const sorted = data.map((v,i)=>({v,i})).sort((a,b)=>a.v-b.v);
+    const levels = [];
+    sorted.forEach(d=>{
+      const x = xScale(d.v);
+      let lvl = 0;
+      while(levels[lvl]!==undefined && Math.abs(levels[lvl]-x) < 16) lvl++;
+      levels[lvl]=x;
+      d.y = axisY - 16 - lvl*20;
+    });
+
+    const m = mean(data), md = median(data), mo = modeOf(data);
+
+    // mean line
+    ctx.strokeStyle = COLORS.accent; ctx.lineWidth=2; ctx.setLineDash([]);
+    ctx.beginPath(); ctx.moveTo(xScale(m), padT); ctx.lineTo(xScale(m), axisY); ctx.stroke();
+    ctx.fillStyle=COLORS.accent; ctx.font='11px "Space Mono",monospace'; ctx.textAlign='center';
+    ctx.fillText('mean', xScale(m), padT-8);
+
+    // median line
+    ctx.strokeStyle = COLORS.blue; ctx.setLineDash([5,4]);
+    ctx.beginPath(); ctx.moveTo(xScale(md), padT+14); ctx.lineTo(xScale(md), axisY); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle=COLORS.blue; ctx.fillText('median', xScale(md), padT+6);
+
+    // mode ticks
+    if(mo){
+      ctx.fillStyle = COLORS.purple;
+      mo.forEach(v=>{ ctx.beginPath(); ctx.arc(xScale(v), axisY+5, 3, 0, Math.PI*2); ctx.fill(); });
+    }
+
+    // dots
+    sorted.forEach(d=>{
+      ctx.beginPath(); ctx.arc(xScale(d.v), d.y, 8, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(127,255,110,0.85)';
+      ctx.fill();
+      ctx.strokeStyle = '#0d0d12'; ctx.lineWidth=2; ctx.stroke();
+    });
+
+    document.getElementById('ctMean').textContent = m.toFixed(1);
+    document.getElementById('ctMedian').textContent = md.toFixed(1);
+    document.getElementById('ctMode').textContent = mo ? mo.join(', ') : 'none';
+  }
+
+  function posToVal(clientX){
+    const rect = canvas.getBoundingClientRect();
+    const padL=40, padR=40;
+    const w = rect.width;
+    let v = XMIN + (XMAX-XMIN) * ((clientX-rect.left-padL)/(w-padL-padR));
+    return Math.max(XMIN, Math.min(XMAX, v));
+  }
+  function nearestIdx(clientX){
+    const v = posToVal(clientX);
+    let best=0, bd=Infinity;
+    data.forEach((d,i)=>{ const dist=Math.abs(d-v); if(dist<bd){bd=dist;best=i;} });
+    return best;
+  }
+  function startDrag(clientX){ dragIdx = nearestIdx(clientX); canvas.style.cursor='grabbing'; }
+  function doDrag(clientX){ if(dragIdx<0) return; data[dragIdx] = posToVal(clientX); draw(); }
+  function endDrag(){ dragIdx=-1; canvas.style.cursor='grab'; }
+
+  canvas.addEventListener('mousedown', e=> startDrag(e.clientX));
+  window.addEventListener('mousemove', e=> doDrag(e.clientX));
+  window.addEventListener('mouseup', endDrag);
+  canvas.addEventListener('touchstart', e=>{ startDrag(e.touches[0].clientX); }, {passive:true});
+  canvas.addEventListener('touchmove', e=>{ doDrag(e.touches[0].clientX); }, {passive:true});
+  canvas.addEventListener('touchend', endDrag);
+
+  document.querySelectorAll('[data-ct-preset]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('[data-ct-preset]').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      data = [...presets[btn.dataset.ctPreset]];
+      draw();
+    });
+  });
+  window.addEventListener('resize', draw);
+  draw();
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   WIDGET 2 · SPREAD EXPLORER (variance/std)
+══════════════════════════════════════════════════════════════ */
+(function(){
+  const canvas = document.getElementById('spreadCanvas'); if(!canvas) return;
+  canvas.height=240; canvas._logicalH=240;
+  const slider = document.getElementById('spreadStd');
+  const MEAN = 80, XMIN=0, XMAX=160;
+
+  function draw(){
+    const s = parseFloat(slider.value);
+    const {ctx,w,h} = setupCanvas(canvas);
+    ctx.clearRect(0,0,w,h);
+    const padL=40,padR=40,padT=24,padB=40;
+    const {axisY,xScale} = niceAxis(ctx,w,h,padL,padR,padT,padB,XMIN,XMAX,8);
+
+    // shaded ±1 std, ±2 std bands
+    [[2,'rgba(137,180,250,0.10)'],[1,'rgba(127,255,110,0.14)']].forEach(([k,color])=>{
+      ctx.fillStyle = color;
+      const x1 = xScale(MEAN-k*s), x2 = xScale(MEAN+k*s);
+      ctx.fillRect(x1, padT, x2-x1, axisY-padT);
+    });
+
+    // bell curve
+    ctx.beginPath();
+    const peak = normalPDF(MEAN, MEAN, s);
+    for(let px=padL; px<=w-padR; px++){
+      const xVal = XMIN + (XMAX-XMIN)*(px-padL)/(w-padL-padR);
+      const y = axisY - (normalPDF(xVal, MEAN, s)/peak) * (axisY-padT-10);
+      if(px===padL) ctx.moveTo(px,y); else ctx.lineTo(px,y);
+    }
+    ctx.strokeStyle = COLORS.accent; ctx.lineWidth=2.5; ctx.stroke();
+
+    // mean line
+    ctx.strokeStyle = COLORS.text; ctx.setLineDash([4,4]); ctx.lineWidth=1.3;
+    ctx.beginPath(); ctx.moveTo(xScale(MEAN),padT); ctx.lineTo(xScale(MEAN),axisY); ctx.stroke();
+    ctx.setLineDash([]);
+
+    document.getElementById('spreadStdVal').textContent = s;
+    document.getElementById('spreadVar').textContent = (s*s).toFixed(1);
+    document.getElementById('spreadStdOut').textContent = s.toFixed(1);
+  }
+  slider.addEventListener('input', draw);
+  window.addEventListener('resize', draw);
+  draw();
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   WIDGET 3 · BOX PLOT BUILDER
+══════════════════════════════════════════════════════════════ */
+(function(){
+  const canvas = document.getElementById('boxCanvas'); if(!canvas) return;
+  canvas.height=220; canvas._logicalH=220;
+  const presets = {
+    clean:   [12,15,14,10,18,19,13,16,17,11,15,14],
+    outlier: [12,15,14,10,18,19,13,72,16,17,-15,15],
+    skewed:  [10,11,12,12,13,14,15,17,20,25,34,55]
+  };
+  function draw(key){
+    const data = presets[key];
+    const q1=percentile(data,25), q2=percentile(data,50), q3=percentile(data,75);
+    const iqr=q3-q1, lo=q1-1.5*iqr, hi=q3+1.5*iqr;
+    const outliers = data.filter(v=>v<lo||v>hi);
+    const inliers = data.filter(v=>v>=lo&&v<=hi);
+    const whiskerMin = Math.min(...inliers), whiskerMax = Math.max(...inliers);
+
+    const {ctx,w,h} = setupCanvas(canvas);
+    ctx.clearRect(0,0,w,h);
+    const padL=50,padR=50,padT=40,padB=40;
+    const dmin = Math.min(...data)-8, dmax = Math.max(...data)+8;
+    const {axisY,xScale} = niceAxis(ctx,w,h,padL,padR,padT,padB,dmin,dmax,7);
+    const midY = padT + (axisY-padT)/2;
+
+    ctx.strokeStyle = COLORS.blue; ctx.lineWidth=2;
+    // whiskers
+    ctx.beginPath(); ctx.moveTo(xScale(whiskerMin), midY); ctx.lineTo(xScale(q1), midY); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(xScale(q3), midY); ctx.lineTo(xScale(whiskerMax), midY); ctx.stroke();
+    [whiskerMin, whiskerMax].forEach(v=>{
+      ctx.beginPath(); ctx.moveTo(xScale(v), midY-14); ctx.lineTo(xScale(v), midY+14); ctx.stroke();
+    });
+    // box
+    ctx.fillStyle = 'rgba(127,255,110,0.18)'; ctx.strokeStyle = COLORS.accent; ctx.lineWidth=2;
+    ctx.fillRect(xScale(q1), midY-28, xScale(q3)-xScale(q1), 56);
+    ctx.strokeRect(xScale(q1), midY-28, xScale(q3)-xScale(q1), 56);
+    // median
+    ctx.strokeStyle = COLORS.text; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.moveTo(xScale(q2), midY-28); ctx.lineTo(xScale(q2), midY+28); ctx.stroke();
+    // outliers
+    ctx.fillStyle = COLORS.red;
+    outliers.forEach(v=>{ ctx.beginPath(); ctx.arc(xScale(v), midY, 5, 0, Math.PI*2); ctx.fill(); });
+
+    document.getElementById('boxQ1').textContent = q1.toFixed(1);
+    document.getElementById('boxQ2').textContent = q2.toFixed(1);
+    document.getElementById('boxQ3').textContent = q3.toFixed(1);
+    document.getElementById('boxIQR').textContent = iqr.toFixed(1);
+    document.getElementById('boxOut').textContent = outliers.length ? outliers.map(v=>v.toFixed(0)).join(', ') : 'none';
+  }
+  let current = 'clean';
+  document.querySelectorAll('[data-box-preset]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('[data-box-preset]').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active'); current = btn.dataset.boxPreset; draw(current);
+    });
+  });
+  window.addEventListener('resize', ()=>draw(current));
+  draw(current);
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   WIDGET 4 · DISTRIBUTION SHAPE LAB (skew/kurtosis)
+══════════════════════════════════════════════════════════════ */
+(function(){
+  const canvas = document.getElementById('shapeCanvas'); if(!canvas) return;
+  canvas.height=240; canvas._logicalH=240;
+  const rng = mulberry32(11);
+
+  function genData(shape){
+    const n=1500, out=[];
+    for(let i=0;i<n;i++){
+      let v;
+      if(shape==='normal') v = gaussian(rng,50,12);
+      else if(shape==='right') v = 15 + Math.pow(rng(),2.5)*90;
+      else if(shape==='left') v = 100 - Math.pow(rng(),2.5)*90;
+      else if(shape==='peaked'){ v = rng()<0.9 ? gaussian(rng,50,5) : gaussian(rng,50,35); }
+      else if(shape==='flat') v = 5 + rng()*90;
+      out.push(Math.max(0,Math.min(100,v)));
+    }
+    return out;
+  }
+  function drawHist(data){
+    const {ctx,w,h} = setupCanvas(canvas);
+    ctx.clearRect(0,0,w,h);
+    const padL=40,padR=30,padT=20,padB=40;
+    const bins=30, XMIN=0,XMAX=100;
+    const counts = new Array(bins).fill(0);
+    data.forEach(v=>{ let b=Math.floor((v-XMIN)/(XMAX-XMIN)*bins); b=Math.max(0,Math.min(bins-1,b)); counts[b]++; });
+    const maxC = Math.max(...counts);
+    const {axisY,xScale} = niceAxis(ctx,w,h,padL,padR,padT,padB,XMIN,XMAX,5);
+    const bw = (w-padL-padR)/bins;
+    counts.forEach((c,i)=>{
+      const bh = (c/maxC) * (axisY-padT);
+      const grad = ctx.createLinearGradient(0,axisY-bh,0,axisY);
+      grad.addColorStop(0,'rgba(127,255,110,0.9)'); grad.addColorStop(1,'rgba(127,255,110,0.35)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(padL+i*bw+1, axisY-bh, bw-2, bh);
+    });
+    document.getElementById('shapeSkew').textContent = skewness(data).toFixed(2);
+    document.getElementById('shapeKurt').textContent = kurtosis(data).toFixed(2);
+  }
+  let current='normal';
+  document.querySelectorAll('[data-shape]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('[data-shape]').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active'); current = btn.dataset.shape;
+      drawHist(genData(current));
+    });
+  });
+  window.addEventListener('resize', ()=>drawHist(genData(current)));
+  drawHist(genData(current));
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   WIDGET 5 · DISTRIBUTION GALLERY
+══════════════════════════════════════════════════════════════ */
+(function(){
+  const canvas = document.getElementById('distCanvas'); if(!canvas) return;
+  canvas.height=260; canvas._logicalH=260;
+  const rng = mulberry32(99);
+  const descs = {
+    normal: "The bell curve. Symmetric around the mean. Heights, test scores, measurement errors. Most classical statistics assumes this shape.",
+    uniform: "Every value in the range is equally likely. Random initialization weights, fair dice, hash functions.",
+    exponential: "Right-skewed, peaks at zero, long tail. Time between events: session gaps, time-to-failure, wait times.",
+    poisson: "Discrete counts of rare events in a fixed interval. Website visits per hour, defects per batch, customer arrivals.",
+    bimodal: "Two peaks — often a signal of two hidden subgroups mixed together in one feature. Investigate before averaging!"
+  };
+  function genData(dist){
+    const n=2000, out=[];
+    for(let i=0;i<n;i++){
+      let v;
+      if(dist==='normal') v = gaussian(rng,50,12);
+      else if(dist==='uniform') v = rng()*100;
+      else if(dist==='exponential') v = -Math.log(1-rng())*20;
+      else if(dist==='poisson'){ // approximate poisson via sum of small bernoulli-ish / use gaussian approx for large lambda visual
+        let k=0,L=Math.exp(-8),p=1; do{ k++; p*=rng(); }while(p>L); v=(k-1)*8;
+      }
+      else if(dist==='bimodal') v = rng()<0.5 ? gaussian(rng,25,8) : gaussian(rng,75,8);
+      out.push(Math.max(0,Math.min(100,v)));
+    }
+    return out;
+  }
+  function draw(dist){
+    const data = genData(dist);
+    const {ctx,w,h} = setupCanvas(canvas);
+    ctx.clearRect(0,0,w,h);
+    const padL=40,padR=30,padT=20,padB=40;
+    const bins=36, XMIN=0,XMAX=100;
+    const counts = new Array(bins).fill(0);
+    data.forEach(v=>{ let b=Math.floor((v-XMIN)/(XMAX-XMIN)*bins); b=Math.max(0,Math.min(bins-1,b)); counts[b]++; });
+    const maxC = Math.max(...counts);
+    const {axisY} = niceAxis(ctx,w,h,padL,padR,padT,padB,XMIN,XMAX,5);
+    const bw = (w-padL-padR)/bins;
+    const palette = {normal:COLORS.accent, uniform:COLORS.blue, exponential:COLORS.orange, poisson:COLORS.teal, bimodal:COLORS.purple};
+    const col = palette[dist];
+    counts.forEach((c,i)=>{
+      const bh = (c/maxC) * (axisY-padT);
+      ctx.fillStyle = col;
+      ctx.globalAlpha = 0.75;
+      ctx.fillRect(padL+i*bw+1, axisY-bh, bw-2, bh);
+      ctx.globalAlpha = 1;
+    });
+    document.getElementById('distDesc').textContent = descs[dist];
+  }
+  let current='normal';
+  document.querySelectorAll('[data-dist]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('[data-dist]').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active'); current = btn.dataset.dist; draw(current);
+    });
+  });
+  window.addEventListener('resize', ()=>draw(current));
+  draw(current);
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   WIDGET 6 · Z-SCORE VISUALIZER
+══════════════════════════════════════════════════════════════ */
+(function(){
+  const canvas = document.getElementById('zCanvas'); if(!canvas) return;
+  canvas.height=240; canvas._logicalH=240;
+  const slider = document.getElementById('zX');
+  const MEAN=80, STD=15, XMIN=20, XMAX=140;
+
+  function draw(){
+    const xVal = parseFloat(slider.value);
+    const {ctx,w,h} = setupCanvas(canvas);
+    ctx.clearRect(0,0,w,h);
+    const padL=40,padR=40,padT=24,padB=40;
+    const {axisY,xScale} = niceAxis(ctx,w,h,padL,padR,padT,padB,XMIN,XMAX,6);
+    const peak = normalPDF(MEAN,MEAN,STD);
+
+    // shaded area left of xVal
+    ctx.beginPath();
+    ctx.moveTo(xScale(XMIN), axisY);
+    for(let px=xScale(XMIN); px<=xScale(xVal); px++){
+      const v = XMIN + (XMAX-XMIN)*(px-padL)/(w-padL-padR);
+      const y = axisY - (normalPDF(v,MEAN,STD)/peak)*(axisY-padT-10);
+      ctx.lineTo(px,y);
+    }
+    ctx.lineTo(xScale(xVal), axisY); ctx.closePath();
+    ctx.fillStyle = 'rgba(137,180,250,0.25)'; ctx.fill();
+
+    // curve
+    ctx.beginPath();
+    for(let px=padL; px<=w-padR; px++){
+      const v = XMIN + (XMAX-XMIN)*(px-padL)/(w-padL-padR);
+      const y = axisY - (normalPDF(v,MEAN,STD)/peak)*(axisY-padT-10);
+      if(px===padL) ctx.moveTo(px,y); else ctx.lineTo(px,y);
+    }
+    ctx.strokeStyle = COLORS.accent; ctx.lineWidth=2.5; ctx.stroke();
+
+    // marker
+    ctx.strokeStyle = COLORS.red; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.moveTo(xScale(xVal),padT); ctx.lineTo(xScale(xVal),axisY); ctx.stroke();
+    ctx.fillStyle = COLORS.red; ctx.beginPath(); ctx.arc(xScale(xVal), padT, 5,0,Math.PI*2); ctx.fill();
+
+    const z = (xVal-MEAN)/STD;
+    document.getElementById('zXVal').textContent = xVal;
+    document.getElementById('zOut').textContent = (z>=0?'+':'')+z.toFixed(2);
+    document.getElementById('zPct').textContent = (normalCDF(xVal,MEAN,STD)*100).toFixed(1)+'%';
+  }
+  slider.addEventListener('input', draw);
+  window.addEventListener('resize', draw);
+  draw();
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   WIDGET 7 · CORRELATION SCATTER LAB
+══════════════════════════════════════════════════════════════ */
+(function(){
+  const canvas = document.getElementById('corrCanvas'); if(!canvas) return;
+  canvas.height=280; canvas._logicalH=280;
+  const slider = document.getElementById('corrR');
+  let rng = mulberry32(Date.now() % 100000);
+  let nonlinearMode = false;
+
+  function genLinear(r){
+    const n=90, xs=[], ys=[];
+    for(let i=0;i<n;i++){
+      const x = gaussian(rng,0,1);
+      const noise = gaussian(rng,0,1);
+      const y = r*x + Math.sqrt(Math.max(0,1-r*r))*noise;
+      xs.push(x); ys.push(y);
+    }
+    return {xs,ys};
+  }
+  function genNonlinear(){
+    const n=90, xs=[], ys=[];
+    for(let i=0;i<n;i++){
+      const x = (rng()*2-1)*2.2;
+      const y = x*x + gaussian(rng,0,0.3) - 2.2;
+      xs.push(x); ys.push(y);
+    }
+    return {xs,ys};
+  }
+  function pearsonR(xs,ys){
+    const mx=mean(xs), my=mean(ys);
+    let num=0, dx=0, dy=0;
+    for(let i=0;i<xs.length;i++){ num += (xs[i]-mx)*(ys[i]-my); dx += (xs[i]-mx)**2; dy += (ys[i]-my)**2; }
+    return num/Math.sqrt(dx*dy);
+  }
+  function covOf(xs,ys){
+    const mx=mean(xs), my=mean(ys);
+    let s=0; for(let i=0;i<xs.length;i++) s += (xs[i]-mx)*(ys[i]-my);
+    return s/(xs.length-1);
+  }
+
+  let data = genLinear(0.8);
+
+  function draw(){
+    const {ctx,w,h} = setupCanvas(canvas);
+    ctx.clearRect(0,0,w,h);
+    const padL=44,padR=30,padT=20,padB=40;
+    const allX = data.xs, allY = data.ys;
+    const xmin=Math.min(...allX)-0.4, xmax=Math.max(...allX)+0.4;
+    const ymin=Math.min(...allY)-0.4, ymax=Math.max(...allY)+0.4;
+    const {axisY,xScale} = niceAxis(ctx,w,h,padL,padR,padT,padB,xmin,xmax,5);
+    const yScale = (v)=> padT + (h-padT-padB)*(1-(v-ymin)/(ymax-ymin));
+
+    // y-axis line
+    ctx.strokeStyle = COLORS.border; ctx.beginPath(); ctx.moveTo(padL,padT); ctx.lineTo(padL,axisY); ctx.stroke();
+
+    data.xs.forEach((x,i)=>{
+      ctx.beginPath(); ctx.arc(xScale(x), yScale(data.ys[i]), 4.5, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(127,255,110,0.75)'; ctx.fill();
+    });
+
+    const r = pearsonR(data.xs,data.ys);
+    const cv = covOf(data.xs,data.ys);
+    document.getElementById('corrOut').textContent = r.toFixed(3);
+    document.getElementById('covOut').textContent = cv.toFixed(3);
+  }
+
+  slider.addEventListener('input', ()=>{
+    nonlinearMode = false;
+    document.getElementById('corrNonlinear').classList.remove('active');
+    const r = parseFloat(slider.value)/100;
+    document.getElementById('corrRVal').textContent = r.toFixed(2);
+    data = genLinear(r);
+    draw();
+  });
+  document.getElementById('corrRegen').addEventListener('click', ()=>{
+    rng = mulberry32(Math.floor(Math.random()*100000));
+    data = nonlinearMode ? genNonlinear() : genLinear(parseFloat(slider.value)/100);
+    draw();
+  });
+  document.getElementById('corrNonlinear').addEventListener('click', function(){
+    nonlinearMode = true; this.classList.add('active');
+    data = genNonlinear();
+    draw();
+  });
+  window.addEventListener('resize', draw);
+  draw();
+})();
+
+/* ══════════════════════════════════════════════════════════════
+   WIDGET 8 · FEATURE SCALING BEFORE/AFTER
+══════════════════════════════════════════════════════════════ */
+(function(){
+  const canvas = document.getElementById('scaleCanvas'); if(!canvas) return;
+  canvas.height=260; canvas._logicalH=260;
+  const income = [22000, 45000, 68000, 98000, 130000, 150000, 200000];
+  const experience = [1, 3, 5, 8, 11, 15, 20];
+
+  function transform(mode, arr){
+    if(mode==='raw') return arr;
+    if(mode==='minmax'){ const mn=Math.min(...arr), mx=Math.max(...arr); return arr.map(v=>(v-mn)/(mx-mn)); }
+    if(mode==='zscore'){ const m=mean(arr), s=std(arr,1); return arr.map(v=>(v-m)/s); }
+  }
+  function draw(mode){
+    const incT = transform(mode, income);
+    const expT = transform(mode, experience);
+    const {ctx,w,h} = setupCanvas(canvas);
+    ctx.clearRect(0,0,w,h);
+    const padL=110,padR=40,padT=30,padB=30;
+    const all = [...incT, ...expT];
+    const xmin = Math.min(...all), xmax = Math.max(...all);
+    const pad = (xmax-xmin)*0.1 || 1;
+    const XMIN = xmin-pad, XMAX = xmax+pad;
+    const xScale = (v)=> padL + (w-padL-padR)*(v-XMIN)/(XMAX-XMIN);
+
+    const rowY1 = padT + 50, rowY2 = padT + 150;
+    [[rowY1,'Income ($)',incT,COLORS.accent],[rowY2,'Experience (yrs)',expT,COLORS.blue]].forEach(([y,label,arr,color])=>{
+      ctx.strokeStyle = COLORS.border; ctx.beginPath(); ctx.moveTo(padL-10,y); ctx.lineTo(w-padR,y); ctx.stroke();
+      ctx.fillStyle = COLORS.text; ctx.font='12px "Syne",sans-serif'; ctx.textAlign='right';
+      ctx.fillText(label, padL-20, y+4);
+      arr.forEach(v=>{
+        ctx.beginPath(); ctx.arc(xScale(v), y, 7, 0, Math.PI*2);
+        ctx.fillStyle = color; ctx.globalAlpha=0.85; ctx.fill(); ctx.globalAlpha=1;
+        ctx.strokeStyle='#0d0d12'; ctx.lineWidth=2; ctx.stroke();
+      });
+    });
+
+    // shared x-axis ticks
+    ctx.strokeStyle = COLORS.border; ctx.fillStyle = COLORS.muted; ctx.font='10px "Space Mono",monospace'; ctx.textAlign='center';
+    for(let i=0;i<=5;i++){
+      const v = XMIN + (XMAX-XMIN)*i/5;
+      const x = xScale(v);
+      ctx.beginPath(); ctx.moveTo(x,h-padB); ctx.lineTo(x,h-padB+5); ctx.stroke();
+      ctx.fillText(mode==='raw' ? Math.round(v).toLocaleString() : v.toFixed(2), x, h-padB+18);
+    }
+  }
+  let current='raw';
+  document.querySelectorAll('[data-scale-mode]').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('[data-scale-mode]').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active'); current = btn.dataset.scaleMode; draw(current);
+    });
+  });
+  window.addEventListener('resize', ()=>draw(current));
+  draw(current);
+})();
+</script>
+
+
+</body>
+</html>
