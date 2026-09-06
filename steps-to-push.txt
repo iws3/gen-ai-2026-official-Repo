@@ -1,0 +1,5 @@
+git add .
+
+git commit -m "type a meaningful message"
+
+git push origin <branch-name> for example git push origin kelly-00
